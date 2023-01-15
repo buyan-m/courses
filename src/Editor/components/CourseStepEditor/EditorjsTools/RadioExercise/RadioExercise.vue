@@ -1,5 +1,8 @@
 <template>
-    <el-form :class="$style.form">
+    <el-form
+        :class="$style.form"
+        @keydown.stop
+    >
         <el-radio-group
             v-model="radioCheck"
             :class="$style.radioGroup"

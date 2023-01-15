@@ -8,14 +8,14 @@
         <ul>
             <li
                 v-for="page in lesson.pages"
-                :key="page.id"
+                :key="page._id"
             >
                 <router-link
-                    :to="{name: 'editor-lesson-update-page', params: {pageId: page.id}}"
+                    :to="{name: 'editor-lesson-update-page', params: {pageId: page._id}}"
                 >
                     {{ page.name }}
                 </router-link>
-                <el-button @click="removePage(page.id)">
+                <el-button @click="removePage(page._id)">
                     X
                 </el-button>
             </li>
@@ -107,8 +107,7 @@ export default defineComponent({
                 } else {
                     // handle error
                 }
-                })
-            }
+            })
         },
 
         headingChangeHandler(value) {
@@ -116,7 +115,9 @@ export default defineComponent({
         },
 
         removePage(pageId) {
-            this.lesson.pages = this.lesson.pages.filter(({ id }) => id !== pageId)
+            request(`/api/editor/pages/${pageId}`, { method: 'delete' }).then(() => {
+                this.lesson.pages = this.lesson.pages.filter(({ _id }) => _id !== pageId)
+            })
         }
     }
 })

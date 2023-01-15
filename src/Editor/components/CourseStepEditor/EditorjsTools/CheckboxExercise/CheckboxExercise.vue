@@ -1,5 +1,8 @@
 <template>
-    <el-form :class="$style.form">
+    <el-form
+        :class="$style.form"
+        @keydown.stop
+    >
         <el-form-item
             v-for="(option, index) in innerOptions"
             :key="index"

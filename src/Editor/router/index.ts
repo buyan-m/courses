@@ -1,7 +1,10 @@
+import { authGuard } from '@/guards'
+
 export default {
     path: '/editor',
     name: 'course-editor',
     component: () => import('@/Editor/views/EditorLayout.vue'),
+    beforeEnter: authGuard,
     children: [
         {
             path: '',
@@ -22,7 +25,7 @@ export default {
                     component: () => import('@/Editor/views/Courses/CourseUpdate.vue')
                 },
                 {
-                    path: ':courseId(c\\d+)',
+                    path: ':courseId',
                     children: [
                         {
                             path: '',
@@ -39,7 +42,7 @@ export default {
                                     component: () => import('@/Editor/views/Courses/Lessons/LessonUpdate.vue')
                                 },
                                 {
-                                    path: ':lessonId(l\\d+)',
+                                    path: ':lessonId',
                                     children: [
                                         {
                                             path: '',
@@ -52,7 +55,7 @@ export default {
                                             component: () => import('@/Editor/views/Courses/Lessons/PageEditor.vue')
                                         },
                                         {
-                                            path: 'page/:pageId(p\\d+)',
+                                            path: 'page/:pageId',
                                             name: 'editor-lesson-update-page',
                                             component: () => import('@/Editor/views/Courses/Lessons/PageEditor.vue')
                                         }

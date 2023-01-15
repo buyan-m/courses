@@ -10,7 +10,7 @@
                 :key="lesson.id"
             >
                 <router-link
-                    :to="{name: 'editor-lesson-update', params: {lessonId: lesson.id}}"
+                    :to="{name: 'editor-lesson-update', params: {lessonId: lesson._id}}"
                 >
                     {{ lesson.name }}
                 </router-link>

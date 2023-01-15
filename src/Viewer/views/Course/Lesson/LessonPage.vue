@@ -42,8 +42,12 @@ export default defineComponent({
         }
     },
     watch: {
-        pageId() {
-            this.updateContent()
+        pageId(value) {
+            if (value) {
+                this.updateContent()
+            } else {
+                // history back triggered
+            }
         }
     },
     created() {
@@ -54,7 +58,7 @@ export default defineComponent({
             this.pageCompleted = true
         },
         goToNextPage() {
-            request<TNextPage>(`/api/lesson/${this.$route.params.lessonId}/page/${this.pageId}/next`, { method: 'post', body: JSON.stringify({ answers: [] }) }).then(({ data }) => {
+            request<TNextPage>(`/api/viewer/pages/${this.pageId}/next`, { method: 'post', body: JSON.stringify({ answers: [] }) }).then(({ data }) => {
                 if (data) {
                     this.$router.push({
                         name: 'viewer-lesson-page',
@@ -71,7 +75,7 @@ export default defineComponent({
         },
         updateContent() {
             this.pageContent = { blocks: [] }
-            request<TViewerPage>(`/api/lesson/${this.$route.params.lessonId}/page/${this.pageId}`).then(({ data }) => {
+            request<TViewerPage>(`/api/viewer/pages/${this.pageId}`).then(({ data }) => {
                 this.pageContent = data!.structure
                 this.nextPage = data!.nextPageAvailable
                 this.pageCompleted = false

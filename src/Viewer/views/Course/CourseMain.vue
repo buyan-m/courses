@@ -7,7 +7,7 @@
                 :key="lesson.id"
             >
                 <router-link
-                    :to="{name: 'viewer-lesson', params: {lessonId: lesson.id}}"
+                    :to="{name: 'viewer-lesson', params: {lessonId: lesson._id}}"
                 >
                     {{ lesson.name }}
                 </router-link>
@@ -29,7 +29,7 @@ export default defineComponent({
     data() {
         return {
             course: {
-                id: '',
+                _id: '',
                 name: '',
                 lessons: []
             } as TCourseStructure,
@@ -41,7 +41,7 @@ export default defineComponent({
     },
     created() {
         if (this.courseId) {
-            request<TCourseStructure>(`/api/courses/${this.courseId}`).then(({ data }) => {
+            request<TCourseStructure>(`/api/viewer/courses/${this.courseId}`).then(({ data }) => {
                 this.course = data!
                 this.pageStatus = PageStatus.ready
             })

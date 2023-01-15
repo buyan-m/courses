@@ -1,5 +1,5 @@
 <template>
-    <div> хуй</div>
+    <div></div>
 </template>
 <script lang="ts">
 export default {

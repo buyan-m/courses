@@ -46,8 +46,30 @@
                 Редактор
             </router-link>
         </el-menu-item>
+        <div :class="$style.spacer" />
+        <el-menu-item
+            index="5"
+            @click="logout"
+        >
+            Выход
+        </el-menu-item>
     </el-menu>
 </template>
 <script lang="ts">
-export default {}
+import request from '@/utils/request'
+
+export default {
+    methods: {
+        logout() {
+            request('/api/logout').then(() => {
+                window.location.reload()
+            })
+        }
+    }
+}
 </script>
+<style module>
+.spacer {
+    flex-grow: 1;
+}
+</style>

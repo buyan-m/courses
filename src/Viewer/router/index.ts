@@ -1,6 +1,9 @@
+import { authGuard } from '@/guards'
+
 export default {
     path: '/viewer',
     component: () => import('@/Viewer/views/ViewerLayout.vue'),
+    beforeEnter: authGuard,
     children: [
         {
             path: '',

@@ -45,10 +45,9 @@ export default defineComponent({
             return this.pageStatus !== PageStatus.loading
         }
     },
-
     created() {
         if (this.$route.params.pageId) {
-            request<TPage>(`/api/editor/page/${this.$route.params.pageId}`).then(({ data, errors }) => {
+            request<TPage>(`/api/editor/pages/${this.$route.params.pageId}`).then(({ data, errors }) => {
                 if (data) {
                     this.initialPageStructure = data.structure
                     this.pageStatus = PageStatus.ready
@@ -68,7 +67,7 @@ export default defineComponent({
             const { lessonId } = this.$route.params
 
             request<TPageCreateResponse>(
-                `/api/editor/page/${routeId}`,
+                `/api/editor/pages/${routeId}`,
                 {
                     method: 'POST',
                     headers: {
@@ -76,7 +75,7 @@ export default defineComponent({
                     },
                     body: JSON.stringify({
                         name: this.page.updatedName,
-                        structuredData: content,
+                        structure: content,
                         lessonId
                     })
                 }

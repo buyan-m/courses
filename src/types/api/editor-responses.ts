@@ -3,18 +3,18 @@ import type {
 } from './common'
 
 export type TCourseStructure = {
-    id: TCourseId,
+    _id: TCourseId,
     name: string,
     lessons: TLessonId[]
 }
 export type TLesson = {
-    id: TLessonId,
+    _id: TLessonId,
     name: string,
     pages: TPageId[]
 }
 
 export type TLessonResponse = {
-    id: TLessonId,
+    _id: TLessonId,
     name: string,
     pages: TPage[]
 }
@@ -23,7 +23,7 @@ export type TLessonCreateResponse = {
 }
 
 export type TPage = {
-    id: TPageId,
+    _id: TPageId,
     name: string,
     structure: {
         blocks: TEditorBlock[]

@@ -30,7 +30,7 @@ export default defineComponent({
         }
     },
     created() {
-        request<TCoursesMap>('/api/courses').then(({ data }) => {
+        request<TCoursesMap>('/api/viewer/courses').then(({ data }) => {
             this.courses = data!
         }, () => {
             // handling

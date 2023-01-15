@@ -1,6 +1,12 @@
-<tempalte>
-    <img :src="src" alt="ugc" :class="$style.image"/>
-</tempalte>
+<template>
+    <div>
+        <img
+            :src="src"
+            alt="ugc"
+            :class="$style.image"
+        >
+    </div>
+</template>
 <script lang="ts">
 import { defineComponent } from 'vue'
 

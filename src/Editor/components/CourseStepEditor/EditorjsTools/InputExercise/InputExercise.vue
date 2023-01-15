@@ -1,5 +1,8 @@
 <template>
-    <el-form :class="$style.form">
+    <el-form
+        :class="$style.form"
+        @keydown.stop
+    >
         <div :class="$style.answers">
             <el-tag
                 v-for="(answer, index) in correctAnswers"

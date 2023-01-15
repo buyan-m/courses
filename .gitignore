@@ -29,3 +29,8 @@ coverage
 
 test-results/
 playwright-report/
+
+auto-imports.d.ts
+components.d.ts
+env.d.ts
+

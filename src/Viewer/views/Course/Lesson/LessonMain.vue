@@ -4,10 +4,10 @@
         <ul>
             <li
                 v-for="page in lesson.pages"
-                :key="page.id"
+                :key="page._id"
             >
                 <router-link
-                    :to="{name: 'viewer-lesson-page', params: {pageId: page.id}}"
+                    :to="{name: 'viewer-lesson-page', params: {pageId: page._id}}"
                 >
                     {{ page.name }}
                 </router-link>
@@ -52,7 +52,7 @@ export default defineComponent({
     },
     created() {
         if (this.lessonId) {
-            request<TLessonResponse>(`/api/lessons/${this.lessonId}`).then(({ data }) => {
+            request<TLessonResponse>(`/api/viewer/lessons/${this.lessonId}`).then(({ data }) => {
                 if (data) {
                     this.lesson = data
                     this.lesson.updatedName = data.name
