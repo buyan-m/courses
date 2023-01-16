@@ -36,7 +36,7 @@ export default class Audio implements BaseTool {
 
     render() {
         if (!this.data.url) {
-            const url = window.prompt('soundcloud url')
+            const url = window.prompt('soundcloud url')!
             this.data.url = url
         }
 

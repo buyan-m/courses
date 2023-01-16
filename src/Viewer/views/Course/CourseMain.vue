@@ -36,12 +36,11 @@ export default defineComponent({
             pageStatus: PageStatus.loading
         }
     },
-    computed: {
-        courseId() { return this.$route.params.courseId }
-    },
+
     created() {
-        if (this.courseId) {
-            request<TCourseStructure>(`/api/viewer/courses/${this.courseId}`).then(({ data }) => {
+        const { courseId } = this.$route.params
+        if (courseId) {
+            request<TCourseStructure>(`/api/viewer/courses/${courseId}`).then(({ data }) => {
                 this.course = data!
                 this.pageStatus = PageStatus.ready
             })

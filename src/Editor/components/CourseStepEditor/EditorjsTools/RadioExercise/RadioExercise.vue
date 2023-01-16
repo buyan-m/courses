@@ -37,7 +37,7 @@
 </template>
 <script lang="ts">
 import { defineComponent } from 'vue'
-import type { TOption } from '@/types/api/exercises'
+import type { TOption } from '@/types/api/page-content'
 
 export default defineComponent({
     props: {
@@ -64,12 +64,13 @@ export default defineComponent({
     },
     created() {
         this.innerOptions = [...this.options] as TOption[]
-        this.radioCheck = this.innerOptions.findIndex((el) => el.isCorrect)
+        this.radioCheck = this.innerOptions.findIndex((el: TOption) => el.isCorrect)
     },
     methods: {
         addOption() {
             this.innerOptions.push({
-                value: ''
+                value: '',
+                isCorrect: false
             })
         },
         removeOption(index: number) {

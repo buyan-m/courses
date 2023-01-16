@@ -19,9 +19,9 @@
 import SingleColumnLayout from '@/layouts/columns/SingleColumnLayout.vue'
 import { PageStatus } from '@/constants/PageStatus'
 import { defineComponent } from 'vue'
-import type { TLessonId } from '@/types/api/common'
 import type { TLessonResponse } from '@/types/api/viewer-responses'
 import request from '@/utils/request'
+import { TPage } from '@/types/api/viewer-responses'
 
 export default defineComponent({
     components: { SingleColumnLayout },
@@ -30,32 +30,19 @@ export default defineComponent({
         return {
             lesson: {
                 name: '',
-                pages: [],
-                updatedName: ''
+                pages: [] as TPage[]
             },
+            updatedName: '',
             pageStatus: PageStatus.loading
         }
     },
-    computed: {
-        lessonId(): TLessonId {
-            return this.$route.params.lessonId as TLessonId
-        },
-        newPageRoute() {
-            return {
-                name: 'editor-lesson-new-page',
-                params: {
-                    lessonId: this.lessonId,
-                    courseId: this.$route.params.courseId
-                }
-            }
-        }
-    },
     created() {
-        if (this.lessonId) {
-            request<TLessonResponse>(`/api/viewer/lessons/${this.lessonId}`).then(({ data }) => {
+        const { lessonId } = this.$route.params
+        if (lessonId) {
+            request<TLessonResponse>(`/api/viewer/lessons/${lessonId}`).then(({ data }) => {
                 if (data) {
                     this.lesson = data
-                    this.lesson.updatedName = data.name
+                    this.updatedName = data.name
                     this.pageStatus = PageStatus.ready
                 } else {
                     // handle error

@@ -1,6 +1,7 @@
 import './styles.css'
+import type { BaseTool } from '@editorjs/editorjs'
 
-export default class Note {
+export default class Note implements BaseTool {
     render() {
         const note = document.createElement('blockquote')
         // note.classList.add('') ??
@@ -9,7 +10,7 @@ export default class Note {
         return note
     }
 
-    save(block) {
+    save(block: HTMLElement) {
         return block.innerText
     }
 

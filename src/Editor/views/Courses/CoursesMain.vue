@@ -15,7 +15,7 @@
             </li>
         </ul>
         <router-link :to="{name: 'editor-course-create'}">
-            <el-button>Создать курс</el-button>
+            <el-button>{{ $t('create') }}</el-button>
         </router-link>
     </SingleColumnLayout>
 </template>
@@ -41,3 +41,13 @@ export default defineComponent({
     }
 })
 </script>
+<i18n lang="json5">
+{
+    "ru": {
+        "create" : "Создать курс"
+    },
+    "en": {
+        "create" : "New course"
+    }
+}
+</i18n>

@@ -38,7 +38,7 @@ import { PageStatus } from '@/constants/PageStatus'
 import { defineComponent } from 'vue'
 import HeadingEditable from '@/Editor/components/HeadingEditable/HeadingEditable.vue'
 import request from '@/utils/request'
-import { TCoursesMap, TCourseStructure } from '@/types/api/editor-responses'
+import type { TCourseStructure, TCourseCreateResponse } from '@/types/api/editor-responses'
 
 export default defineComponent({
     components: { HeadingEditable, SingleColumnLayout },
@@ -46,7 +46,7 @@ export default defineComponent({
     data() {
         return {
             course: {
-                id: 'NOT_ID',
+                _id: 'NOT_ID',
                 name: 'Create new course',
                 lessons: []
             } as TCourseStructure,
@@ -56,7 +56,7 @@ export default defineComponent({
         }
     },
     computed: {
-        courseId() { return this.$route.params.courseId }
+        courseId(): string { return this.$route.params.courseId as string }
     },
     created() {
         if (this.courseId) {
@@ -77,7 +77,7 @@ export default defineComponent({
         saveCourse() {
             const routeId = this.$route.params.courseId || 'create'
 
-            request(`/api/editor/courses/${routeId}`, {
+            request<TCourseCreateResponse>(`/api/editor/courses/${routeId}`, {
                 method: 'post',
                 headers: {
                     'content-type': 'application/json'
@@ -87,9 +87,9 @@ export default defineComponent({
                     lessons: this.course.lessons
                 })
             })
-                .then(({ data: { courseId } }) => {
+                .then(({ data }) => {
                     if (!this.$route.params.courseId) {
-                        this.$router.push({ name: 'editor-course-update', params: { courseId } })
+                        this.$router.push({ name: 'editor-course-update', params: { courseId: data!.courseId } })
                     }
                 })
             this.formWasEdited = false

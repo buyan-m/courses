@@ -4,16 +4,16 @@ require('@rushstack/eslint-patch/modern-module-resolution')
 module.exports = {
     root: true,
     extends: [
+        'eslint:recommended',
         'airbnb-base',
         'airbnb-typescript/base',
         'plugin:vue/vue3-recommended',
-        'eslint:recommended',
         '@vue/eslint-config-typescript',
     ],
     plugins: ['import'],
     parserOptions: {
         ecmaVersion: 'latest',
-        project: ['./tsconfig.app.json'],
+        project: ['./tsconfig.json'],
     },
     settings: {
         'import/resolver': {
@@ -35,7 +35,9 @@ module.exports = {
         '@typescript-eslint/comma-dangle': ['error', 'never'],
         'vue/html-indent': ['error', 4],
         'import/no-named-as-default': 0,
-        'import/no-named-as-default-member': 0
+        'import/no-named-as-default-member': 0,
+        'no-underscore-dangle': 0,
+        'class-methods-use-this': 0
     // quotes: ['error', 'single'],
     // 'coma-dangle': ['error', 'never'],
     // 'object-curly-newline': ['error', { 'multiline': true }],

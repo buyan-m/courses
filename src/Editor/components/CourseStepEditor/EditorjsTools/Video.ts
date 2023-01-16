@@ -1,18 +1,14 @@
 import './styles.css'
+import type { BaseTool } from '@editorjs/editorjs'
+import type { TEditorBlockVideo } from '@/types/api/page-content'
 
-type TSoundCloudResponse = {
-    author_name: string
-    author_url: string
-    description: string
-    height: number
-    html: string
-    provider_name: string
-    thumbnail_url: string
-    title: string
-    width: string
+type TVideoConstructorParams = {
+    data: TEditorBlockVideo['data']
 }
 
-export default class Audio {
+export default class Video implements BaseTool {
+    private readonly data: TEditorBlockVideo['data']
+
     /**
      * @param {object} tool - tool properties got from editor.js
      * @param {ImageToolData} tool.data - previously saved data
@@ -21,22 +17,15 @@ export default class Audio {
      * @param {boolean} tool.readOnly - read-only mode flag
      */
     constructor({
-        data, config, api, readOnly
-    }) {
+        data
+    }: TVideoConstructorParams) {
         this.data = data
-
-        return this
     }
 
     render() {
         if (!this.data.videoId) {
-            const url = new URL(window.prompt('youtube url'))
-            this.data.videoId = url.searchParams.get('v')
-
-            if (false) {
-                // тут асинхронный коллбэк, так как prompt тут не останется
-                // this.api.getCurrentBlockIndex + this.api.delete(index)
-            }
+            const url = new URL(window.prompt('youtube url')!)
+            this.data.videoId = url.searchParams.get('v')!
         }
 
         const iframe = document.createElement('iframe')

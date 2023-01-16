@@ -36,11 +36,6 @@ export default defineComponent({
             nextPage: false
         }
     },
-    computed: {
-        pageId() {
-            return this.$route.params.pageId
-        }
-    },
     watch: {
         pageId(value) {
             if (value) {
@@ -58,7 +53,8 @@ export default defineComponent({
             this.pageCompleted = true
         },
         goToNextPage() {
-            request<TNextPage>(`/api/viewer/pages/${this.pageId}/next`, { method: 'post', body: JSON.stringify({ answers: [] }) }).then(({ data }) => {
+            const { pageId } = this.$route.params
+            request<TNextPage>(`/api/viewer/pages/${pageId}/next`, { method: 'post', body: JSON.stringify({ answers: [] }) }).then(({ data }) => {
                 if (data) {
                     this.$router.push({
                         name: 'viewer-lesson-page',
@@ -75,7 +71,8 @@ export default defineComponent({
         },
         updateContent() {
             this.pageContent = { blocks: [] }
-            request<TViewerPage>(`/api/viewer/pages/${this.pageId}`).then(({ data }) => {
+            const { pageId } = this.$route.params
+            request<TViewerPage>(`/api/viewer/pages/${pageId}`).then(({ data }) => {
                 this.pageContent = data!.structure
                 this.nextPage = data!.nextPageAvailable
                 this.pageCompleted = false

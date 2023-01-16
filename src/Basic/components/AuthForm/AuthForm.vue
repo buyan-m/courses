@@ -78,6 +78,7 @@
 <script lang="ts">
 import request from '@/utils/request'
 import { defineComponent } from 'vue'
+import { RouteLocationRaw } from 'vue-router'
 
 enum Mode {
     'auth' = 'auth',
@@ -127,7 +128,7 @@ export default defineComponent({
             })
         },
         redirect() {
-            const to = this.$route.query.redirect || { name: 'main' }
+            const to = this.$route.query.redirect as RouteLocationRaw || { name: 'main' }
             this.$router.push(to)
         }
     }

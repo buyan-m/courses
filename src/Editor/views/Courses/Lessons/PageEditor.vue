@@ -35,7 +35,14 @@ export default defineComponent({
     },
     data() {
         return {
-            initialPageStructure: { blocks: [{ type: 'paragraph', data: { text: 'Hello! Let me introduce our editor' } }] },
+            initialPageStructure: {
+                blocks: [
+                    {
+                        type: 'paragraph',
+                        data: { text: 'Hello! Let me introduce our editor' }
+                    }
+                ]
+            } as TPage['structure'],
             page: { name: 'placeholder', updatedName: 'placeholder' },
             pageStatus: PageStatus.loading
         }

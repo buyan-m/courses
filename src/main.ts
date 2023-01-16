@@ -1,16 +1,14 @@
 import { createApp } from 'vue'
-import { createI18n } from 'vue-i18n'
+
+// @ts-ignore
+// import { createI18n } from 'vue-i18n/dist/vue-i18n.esm-bundler'
 import elementPlus from 'element-plus'
 import App from './App.vue'
 import router from './router'
 import loadFonts from './plugins/webfontloader'
 import 'element-plus/dist/index.css'
 import 'ress'
-
-const i18n = createI18n({
-    locale: 'en',
-    legacy: false
-})
+import i18n from './i18n'
 
 loadFonts()
 

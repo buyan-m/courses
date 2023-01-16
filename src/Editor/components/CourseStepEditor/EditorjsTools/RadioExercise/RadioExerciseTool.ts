@@ -1,7 +1,7 @@
 import { createApp } from 'vue'
 import type { ComponentPublicInstance } from 'vue'
 import type { BaseTool } from '@editorjs/editorjs'
-import type { TOption } from '@/types/api/exercises'
+import type { TOption } from '@/types/api/page-content'
 import RadioExerciseVue from './RadioExercise.vue'
 
 type TRadioComponent = ComponentPublicInstance<{}, {}, { innerOptions: [] }>

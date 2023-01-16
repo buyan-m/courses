@@ -15,8 +15,11 @@
 import { defineComponent } from 'vue'
 import EditorJS from '@editorjs/editorjs'
 import type { OutputData } from '@editorjs/editorjs'
+// @ts-ignore
 import Header from '@editorjs/header'
+// @ts-ignore
 import List from '@editorjs/list'
+// @ts-ignore
 import ImageTool from '@editorjs/image'
 import Note from './EditorjsTools/Note'
 import Audio from './EditorjsTools/Audio'
@@ -75,7 +78,7 @@ export default defineComponent({
     },
     methods: {
         returnValue() {
-            this.editor.save().then((data) => {
+            this.editor.save().then((data: OutputData) => {
                 this.$emit('save', data)
             })
         }

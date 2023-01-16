@@ -7,6 +7,10 @@ export type TCourseStructure = {
     name: string,
     lessons: TLessonId[]
 }
+export type TCourseCreateResponse = {
+    courseId: TCourseId
+}
+
 export type TLesson = {
     _id: TLessonId,
     name: string,
@@ -34,6 +38,5 @@ export type TPageCreateResponse = {
     pageId: TPageId
 }
 
-export type TCoursesMap = Record<TCourseId, TCourseStructure>
 export type TLessonsList = TLesson[]
 export type TPagesList = TPage[]

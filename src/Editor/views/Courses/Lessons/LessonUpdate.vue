@@ -37,7 +37,9 @@ import HeadingEditable from '@/Editor/components/HeadingEditable/HeadingEditable
 import { PageStatus } from '@/constants/PageStatus'
 import { defineComponent } from 'vue'
 import request from '@/utils/request'
-import type { TLessonResponse, TLessonCreateResponse } from '@/types/api/editor-responses'
+import type { TLessonResponse, TLessonCreateResponse, TPage } from '@/types/api/editor-responses'
+import type { TPageId } from '@/types/api/common'
+import { RouteLocationRaw } from 'vue-router'
 
 export default defineComponent({
     components: { SingleColumnLayout, HeadingEditable },
@@ -46,15 +48,15 @@ export default defineComponent({
         return {
             lesson: {
                 name: '',
-                pages: [],
-                updatedName: ''
+                pages: [] as TPage[]
             },
+            updatedName: 'Lesson',
             pageStatus: PageStatus.loading
         }
     },
     computed: {
-        lessonId() { return this.$route.params.lessonId },
-        newPageRoute() {
+        lessonId(): string { return this.$route.params.lessonId as string },
+        newPageRoute(): RouteLocationRaw {
             return {
                 name: 'editor-lesson-new-page',
                 params: {
@@ -69,7 +71,7 @@ export default defineComponent({
             request<TLessonResponse>(`/api/editor/lessons/${this.lessonId}`).then(({ data }) => {
                 if (data) {
                     this.lesson = data
-                    this.lesson.updatedName = data.name
+                    this.updatedName = data.name
                     this.pageStatus = PageStatus.ready
                 } else {
                     // handle error
@@ -94,7 +96,7 @@ export default defineComponent({
                     },
                     body: JSON.stringify({
                         ...this.lesson,
-                        name: this.lesson.updatedName,
+                        name: this.updatedName,
                         courseId
                     })
                     // delete updated name before sent
@@ -110,13 +112,13 @@ export default defineComponent({
             })
         },
 
-        headingChangeHandler(value) {
-            this.lesson.updatedName = value
+        headingChangeHandler(value: string) {
+            this.updatedName = value
         },
 
-        removePage(pageId) {
+        removePage(pageId: TPageId) {
             request(`/api/editor/pages/${pageId}`, { method: 'delete' }).then(() => {
-                this.lesson.pages = this.lesson.pages.filter(({ _id }) => _id !== pageId)
+                this.lesson.pages = this.lesson.pages.filter((page: TPage) => page._id !== pageId)
             })
         }
     }

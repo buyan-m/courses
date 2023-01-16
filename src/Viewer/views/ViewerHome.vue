@@ -20,17 +20,17 @@
 import { defineComponent } from 'vue'
 import SingleColumnLayout from '@/layouts/columns/SingleColumnLayout.vue'
 import request from '@/utils/request'
-import type { TCoursesMap } from '@/types/api/editor-responses'
+import type { TCourseStructure } from '@/types/api/editor-responses'
 
 export default defineComponent({
     components: { SingleColumnLayout },
     data() {
         return {
-            courses: []
+            courses: [] as TCourseStructure[]
         }
     },
     created() {
-        request<TCoursesMap>('/api/viewer/courses').then(({ data }) => {
+        request<TCourseStructure[]>('/api/viewer/courses').then(({ data }) => {
             this.courses = data!
         }, () => {
             // handling
