@@ -1,0 +1,16 @@
+{
+    "extends": "@vue/tsconfig/tsconfig.node.json",
+    "compilerOptions": {
+        "target": "es2016",
+        "module": "commonjs",
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
+        "strict": true,
+        "skipLibCheck": true
+    },
+    "include": [
+        "*.ts",
+        "**/*.ts"
+    ],
+    "baseUrl": "e2e"
+}

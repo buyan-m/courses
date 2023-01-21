@@ -35,3 +35,5 @@ components.d.ts
 env.d.ts
 tsconfig.tsbuildinfo
 
+e2e/data.json
+

@@ -1,7 +1,7 @@
 const SERVER_ORIGIN = ''
 type TResponse<T> = {
     data: T | null,
-    errors: Error[]
+    errors: string[]
 }
 
 export default function request<T>(path: string, params?: RequestInit) {
@@ -11,17 +11,25 @@ export default function request<T>(path: string, params?: RequestInit) {
         },
         mode: 'cors',
         ...params
-    }).then((resp):Promise<TResponse<T>> => {
-        if (resp.ok) {
-            return resp.json().then((data) => ({
-                data,
-                errors: []
-            }))
-            // maybe check errors inside
+    }).then(async (resp):Promise<TResponse<T>> => {
+        try {
+            const body = await resp.json()
+            if (resp.ok) {
+                return {
+                    data: body,
+                    errors: []
+                }
+            }
+            return {
+                data: null,
+                errors: body.message
+            }
+        } catch (error) {
+            const message = (error as Error).toString()
+            return {
+                data: null,
+                errors: [message]
+            }
         }
-        return Promise.resolve({
-            data: null,
-            errors: [new Error('yeap')]
-        })
     })
 }

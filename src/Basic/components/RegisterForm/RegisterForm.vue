@@ -1,22 +1,32 @@
 <template>
     <el-form
         ref="formRef"
-        :model="authForm"
+        :model="registerForm"
+        :rules="registerFormValidationRules"
         :class="$style.form"
-        :rules="authFormValidationRules"
         hide-required-asterisk
     >
         <h3 :class="$style.heading">
-            Auth
+            Register
         </h3>
+        <el-form-item
+            label="Name"
+            prop="name"
+            data-test="auth.nameRow"
+        >
+            <el-input
+                v-model="registerForm.name"
+                data-test="auth.name"
+                autocomplete="username"
+            />
+        </el-form-item>
         <el-form-item
             label="Email"
             prop="email"
             data-test="auth.emailRow"
         >
             <el-input
-                v-model="authForm.email"
-                type="email"
+                v-model="registerForm.email"
                 autocomplete="email"
                 data-test="auth.email"
             />
@@ -27,10 +37,10 @@
             data-test="auth.passwordRow"
         >
             <el-input
-                v-model="authForm.password"
+                v-model="registerForm.password"
                 type="password"
                 data-test="auth.password"
-                autocomplete="current-password"
+                autocomplete="new-password"
             />
         </el-form-item>
         <div :class="$style.footer">
@@ -44,17 +54,19 @@
             <el-button
                 v-else
                 type="primary"
-                data-test="auth.login"
-                @click="auth"
-            >
-                Log in
-            </el-button>
-            <el-button
-                data-test="auth.switchToRegister"
-                @click="changeMode(register)"
+                data-test="auth.register"
+                @click="register"
             >
                 Register
             </el-button>
+            <span>
+                <el-button
+                    data-test="auth.switchToAuth"
+                    @click="changeMode"
+                >
+                    Log in
+                </el-button>
+            </span>
         </div>
     </el-form>
 </template>
@@ -64,6 +76,7 @@ import { FormInstance } from 'element-plus'
 import authValidationRules from '@/constants/AuthValidationRules'
 
 export default defineComponent({
+
     props: {
         errors: {
             type: Object,
@@ -72,18 +85,21 @@ export default defineComponent({
     },
     emits: {
         changeMode: (mode: string) => true,
-        auth: (credentials: { email: string, password: string }) => true
+        register: (credentials: { email: string, password: string, name: string }) => true
     },
+
     data() {
         return {
-            authForm: {
+            registerForm: {
                 email: '',
-                password: ''
+                password: '',
+                name: ''
             },
             formUntouched: true,
-            authFormValidationRules: {
+            registerFormValidationRules: {
                 email: [...authValidationRules.email],
-                password: [...authValidationRules.password]
+                password: [...authValidationRules.password],
+                name: [...authValidationRules.name]
             }
         }
     },
@@ -91,7 +107,7 @@ export default defineComponent({
         errors() {
             this.formUntouched = true
         },
-        authForm: {
+        registerForm: {
             handler() {
                 this.formUntouched = false
             },
@@ -99,19 +115,20 @@ export default defineComponent({
         }
     },
     methods: {
-        auth() {
+        register() {
             const ref = this.$refs.formRef as FormInstance
             ref.validate((valid) => {
                 if (valid) {
-                    this.$emit('auth', {
-                        email: this.authForm.email,
-                        password: this.authForm.password
+                    this.$emit('register', {
+                        email: this.registerForm.email,
+                        password: this.registerForm.password,
+                        name: this.registerForm.name
                     })
                 }
             })
         },
         changeMode() {
-            this.$emit('changeMode', 'register')
+            this.$emit('changeMode', 'auth')
         }
     }
 })
