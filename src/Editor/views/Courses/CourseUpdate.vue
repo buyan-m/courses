@@ -1,102 +1,114 @@
 <template>
     <SingleColumnLayout v-loading="pageStatus === 'loading'">
-        <HeadingEditable
-            :text="course.name"
-            @change="headingChangeHandler"
-        />
-        <ul>
-            <li
-                v-for="lesson in course.lessons"
-                :key="lesson.id"
+        <section :class="$style.courseSection">
+            <HeadingEditable
+                :text="$store.course.name"
+                @change="headingUpdate"
+            />
+
+            <el-input
+                v-model="$store.course.description"
+                type="textarea"
+                resize="none"
+                autosize
+                @input="descriptionUpdate"
+            />
+            <transition
+                :leave-active-class="$style.opacityLeaveActive"
+                :leave-to-class="$style.opacityLeaveTo"
             >
-                <router-link
-                    :to="{name: 'editor-lesson-update', params: {lessonId: lesson._id}}"
-                >
-                    {{ lesson.name }}
-                </router-link>
-            </li>
-        </ul>
-        <el-button
-            v-if="formWasEdited"
-            @click="saveCourse"
-        >
-            Сохранить курс
-        </el-button>
-        <router-link
-            v-if="courseId"
-            :to="{name: 'editor-lessons-new'}"
-        >
-            <el-button :disabled="formWasEdited">
-                Создать урок
-            </el-button>
-        </router-link>
+                <div
+                    v-if="$store.courseStatus === CourseStatus.requesting"
+                    v-loading="true"
+                    :class="$style.preloader"
+                />
+            </transition>
+        </section>
+
+        <CourseLessons
+            v-if="$store.courseStatus !== CourseStatus.new"
+            :lessons="$store.course.lessons"
+            :course-id="$store.courseId"
+            @saveLesson="lessonChanged"
+        />
     </SingleColumnLayout>
 </template>
-<script lang="ts">
-import SingleColumnLayout from '@/layouts/columns/SingleColumnLayout.vue'
+<script lang="ts" setup>
+import { ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { PageStatus } from '@/constants/PageStatus'
-import { defineComponent } from 'vue'
+import SingleColumnLayout from '@/layouts/columns/SingleColumnLayout.vue'
 import HeadingEditable from '@/Editor/components/HeadingEditable/HeadingEditable.vue'
-import request from '@/utils/request'
-import type { TCourseStructure, TCourseCreateResponse } from '@/types/api/editor-responses'
+import CourseLessons from '@/Editor/components/CourseLessons/CourseLessons.vue'
+import type { TLesson } from '@/types/api/editor-responses'
+import { CourseStatus } from '@/constants/CourseStatus'
+import { useCourseUpdateStore } from './CourseUpdate.store'
 
-export default defineComponent({
-    components: { HeadingEditable, SingleColumnLayout },
+const $store = useCourseUpdateStore()
+const $route = useRoute()
+const $router = useRouter()
 
-    data() {
-        return {
-            course: {
-                _id: 'NOT_ID',
-                name: 'Create new course',
-                lessons: []
-            } as TCourseStructure,
-            updatedName: 'Create new course',
-            pageStatus: PageStatus.loading,
-            formWasEdited: false
-        }
-    },
-    computed: {
-        courseId(): string { return this.$route.params.courseId as string }
-    },
-    created() {
-        if (this.courseId) {
-            request<TCourseStructure>(`/api/editor/courses/${this.courseId}`).then(({ data }) => {
-                this.course = data!
-                this.updatedName = data!.name
-                this.pageStatus = PageStatus.ready
-            })
-        } else {
-            this.pageStatus = PageStatus.ready
-        }
-    },
-    methods: {
-        headingChangeHandler(value: string) {
-            this.updatedName = value
-            this.formWasEdited = true
-        },
-        saveCourse() {
-            const routeId = this.$route.params.courseId || 'create'
+const pageStatus = ref(PageStatus.loading)
 
-            request<TCourseCreateResponse>(`/api/editor/courses/${routeId}`, {
-                method: 'post',
-                headers: {
-                    'content-type': 'application/json'
-                },
-                body: JSON.stringify({
-                    name: this.updatedName,
-                    lessons: this.course.lessons
-                })
-            })
-                .then(({ data }) => {
-                    if (!this.$route.params.courseId) {
-                        this.$router.push({ name: 'editor-course-update', params: { courseId: data!.courseId } })
-                    }
-                })
-            this.formWasEdited = false
-        }
-    }
+const routeCourseId = ref($route.params.courseId as string)
+
+let changeCourseTimeout = 0
+
+$store.getCourse(routeCourseId.value).then(() => {
+    pageStatus.value = PageStatus.ready
 })
+
+function saveCourse() {
+    if (changeCourseTimeout) {
+        clearTimeout(changeCourseTimeout)
+    }
+    changeCourseTimeout = setTimeout(() => {
+        $store.saveCourse().then((courseId) => {
+            if (!routeCourseId.value) {
+                routeCourseId.value = courseId
+                $router.push({ name: 'editor-course-update', params: { courseId } })
+            }
+        })
+    }, 700)
+}
+
+function lessonChanged(lesson: TLesson) {
+    $store.saveLesson(lesson)
+}
+
+function headingUpdate(heading: string) {
+    $store.courseHeadingUpdate(heading)
+    saveCourse()
+}
+
+function descriptionUpdate(description: string) {
+    $store.courseDescriptionUpdate(description)
+    saveCourse()
+}
+
 </script>
+<style module>
+.courseSection {
+    position: relative;
+    margin-bottom: 40px;
+}
+.preloader {
+    position: absolute;
+    top: 0;
+    right: 0;
+    opacity: 1;
+    width: 40px;
+    height: 40px;
+}
+
+.opacityLeaveActive {
+    transition: opacity 0.5s ease;
+}
+
+.opacityLeaveTo {
+    opacity: 0;
+}
+</style>
 <i18n lang="json">
 {
     "en": {

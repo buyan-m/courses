@@ -5,7 +5,8 @@ import type {
 export type TCourseStructure = {
     _id: TCourseId,
     name: string,
-    lessons: TLessonId[]
+    description: string,
+    lessons: TLesson[]
 }
 export type TCourseCreateResponse = {
     courseId: TCourseId
@@ -14,14 +15,15 @@ export type TCourseCreateResponse = {
 export type TLesson = {
     _id: TLessonId,
     name: string,
-    pages: TPageId[]
+    pages: Omit<TPage, 'structure'>[]
 }
 
-export type TLessonResponse = {
-    _id: TLessonId,
+export type TLessonCreateDTO = {
+    _id?: TLessonId,
     name: string,
-    pages: TPage[]
+    courseId: TCourseId
 }
+
 export type TLessonCreateResponse = {
     lessonId: TLessonId,
 }

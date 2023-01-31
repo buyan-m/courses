@@ -2,18 +2,13 @@
     <SingleColumnLayout>
         <h1>Главная курсов</h1>
         <p>Страница с доступными для редактирования курсами, возможно какой-то дашборд</p>
-        <ul>
-            <li
+        <section :class="$style.courses">
+            <CourseCard
                 v-for="course in courses"
                 :key="course._id"
-            >
-                <router-link
-                    :to="{name: 'editor-course-update', params: {courseId: course._id}}"
-                >
-                    {{ course.name }}
-                </router-link>
-            </li>
-        </ul>
+                :course="course"
+            />
+        </section>
         <router-link :to="{name: 'editor-course-create'}">
             <el-button>{{ $t('create') }}</el-button>
         </router-link>
@@ -24,9 +19,10 @@ import SingleColumnLayout from '@/layouts/columns/SingleColumnLayout.vue'
 import { defineComponent } from 'vue'
 import request from '@/utils/request'
 import type { TCourseStructure } from '@/types/api/editor-responses'
+import CourseCard from '@/Editor/components/CourseCard/CourseCard.vue'
 
 export default defineComponent({
-    components: { SingleColumnLayout },
+    components: { CourseCard, SingleColumnLayout },
     data() {
         return {
             courses: [] as TCourseStructure[]
@@ -41,7 +37,15 @@ export default defineComponent({
     }
 })
 </script>
-<i18n lang="json5">
+<style module>
+.courses {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding-bottom: 20px;
+}
+</style>
+<i18n>
 {
     "ru": {
         "create" : "Создать курс"

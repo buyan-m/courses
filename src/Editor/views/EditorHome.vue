@@ -1,31 +1,26 @@
 <template>
-    <TwoColumnsLayout>
-        <template #secondary>
-            <p>кек</p>
-        </template>
-        <template #primary>
-            <h2>
-                Редактор курсов
-            </h2>
-            <p>
-                Страница с описанием возможностей редактора курсов, быстрые ссылки, миссия проекта
-            </p>
-            <router-link
-                :class="$style.button"
-                :to="{name: 'editor-courses-main'}"
-            >
-                <el-button>
-                    Курсы
-                </el-button>
-            </router-link>
-        </template>
-    </TwoColumnsLayout>
+    <SingleColumnLayout>
+        <h2>
+            Редактор курсов
+        </h2>
+        <p>
+            Страница с описанием возможностей редактора курсов, быстрые ссылки, миссия проекта
+        </p>
+        <router-link
+            :class="$style.button"
+            :to="{name: 'editor-courses-main'}"
+        >
+            <el-button>
+                Курсы
+            </el-button>
+        </router-link>
+    </SingleColumnLayout>
 </template>
 <script lang="ts">
-import TwoColumnsLayout from '@/layouts/columns/TwoColumnsLayout.vue'
+import SingleColumnLayout from '@/layouts/columns/SingleColumnLayout.vue'
 
 export default {
-    components: { TwoColumnsLayout }
+    components: { SingleColumnLayout }
 }
 </script>
 <style module>

@@ -1,5 +1,5 @@
 <template>
-    <SingleColumnLayout>
+    <SingleColumnLayout v-loading="pageStatus === 'loading'">
         <LessonPageContent
             :content="pageContent"
             @answersReceived="answersReceived"
@@ -26,6 +26,7 @@ import SingleColumnLayout from '@/layouts/columns/SingleColumnLayout.vue'
 import LessonPageContent from '@/Viewer/components/LessonPageContent/LessonPageContent.vue'
 import request from '@/utils/request'
 import type { TViewerPage, TNextPage } from '@/types/api/viewer-responses'
+import { PageStatus } from '@/constants/PageStatus'
 
 export default defineComponent({
     components: { LessonPageContent, SingleColumnLayout },
@@ -33,7 +34,13 @@ export default defineComponent({
         return {
             pageContent: [] as unknown as TViewerPage['structure'],
             pageCompleted: false,
-            nextPage: false
+            nextPage: false,
+            pageStatus: PageStatus.loading
+        }
+    },
+    computed: {
+        pageId():string {
+            return this.$route.params.pageId as unknown as string
         }
     },
     watch: {
@@ -54,7 +61,11 @@ export default defineComponent({
         },
         goToNextPage() {
             const { pageId } = this.$route.params
-            request<TNextPage>(`/api/viewer/pages/${pageId}/next`, { method: 'post', body: JSON.stringify({ answers: [] }) }).then(({ data }) => {
+            this.pageStatus = PageStatus.loading
+            request<TNextPage>(`/api/viewer/pages/${pageId}/next`, {
+                method: 'post',
+                body: JSON.stringify({ answers: [] })
+            }).then(({ data }) => {
                 if (data) {
                     this.$router.push({
                         name: 'viewer-lesson-page',
@@ -65,27 +76,36 @@ export default defineComponent({
                         }
                     })
                 } else {
-                    // handle error
+                    this.pageStatus = PageStatus.error
                 }
             })
         },
         updateContent() {
             this.pageContent = { blocks: [] }
             const { pageId } = this.$route.params
+            this.pageStatus = PageStatus.loading
             request<TViewerPage>(`/api/viewer/pages/${pageId}`).then(({ data }) => {
-                this.pageContent = data!.structure
-                this.nextPage = data!.nextPageAvailable
-                this.pageCompleted = false
+                if (data) {
+                    this.pageContent = data!.structure
+                    this.nextPage = data!.nextPageAvailable
+                    this.pageCompleted = false
+                    this.pageStatus = PageStatus.ready
+                } else {
+                    this.pageStatus = PageStatus.error
+                }
             })
         },
         completeLesson() {
-            this.$router.push({
-                name: 'viewer-course',
-                params: {
-                    lessonId: this.$route.params.lessonId,
-                    courseId: this.$route.params.courseId
-                }
-            })
+            this.pageStatus = PageStatus.loading
+            request<TViewerPage>(`/api/viewer/lessons/${this.$route.params.lessonId}/complete`, { method: 'post' })
+                .then(() => {
+                    this.$router.push({
+                        name: 'viewer-course',
+                        params: {
+                            courseId: this.$route.params.courseId
+                        }
+                    })
+                })
         }
     }
 })

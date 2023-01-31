@@ -4,7 +4,7 @@
         mode="horizontal"
     >
         <el-menu-item index="1">
-            ¿¿Project??
+            Dewey.edu
         </el-menu-item>
         <el-sub-menu index="2">
             <template #title>

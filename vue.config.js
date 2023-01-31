@@ -15,8 +15,8 @@ module.exports = defineConfig({
             '^/api': {
                 target: 'http://0.0.0.0:3000/',
                 pathRewrite: { '^/api': '' },
-            }
-        }
+            },
+        },
     },
 
     configureWebpack: {
@@ -26,8 +26,16 @@ module.exports = defineConfig({
             }),
             Components({
                 resolvers: [ElementPlusResolver()],
-            })
-        ]
+            }),
+        ],
+        module: {
+            rules: [
+                {
+                    test: /\.(png|svg|jpg|jpeg|gif)$/i,
+                    type: 'asset/resource',
+                },
+            ],
+        },
     },
 
     pluginOptions: {
@@ -38,7 +46,7 @@ module.exports = defineConfig({
             enableLegacy: true,
             runtimeOnly: false,
             compositionOnly: true,
-            fullInstall: true
-        }
-    }
+            fullInstall: true,
+        },
+    },
 })

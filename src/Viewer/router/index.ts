@@ -22,11 +22,6 @@ export default {
                     path: 'lesson/:lessonId',
                     children: [
                         {
-                            path: '',
-                            name: 'viewer-lesson',
-                            component: () => import('@/Viewer/views/Course/Lesson/LessonMain.vue')
-                        },
-                        {
                             path: 'page/:pageId',
                             name: 'viewer-lesson-page',
                             component: () => import('@/Viewer/views/Course/Lesson/LessonPage.vue')

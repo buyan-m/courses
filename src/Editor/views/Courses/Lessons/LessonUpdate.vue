@@ -37,7 +37,7 @@ import HeadingEditable from '@/Editor/components/HeadingEditable/HeadingEditable
 import { PageStatus } from '@/constants/PageStatus'
 import { defineComponent } from 'vue'
 import request from '@/utils/request'
-import type { TLessonResponse, TLessonCreateResponse, TPage } from '@/types/api/editor-responses'
+import type { TLesson, TLessonCreateResponse, TPage } from '@/types/api/editor-responses'
 import type { TPageId } from '@/types/api/common'
 import { RouteLocationRaw } from 'vue-router'
 
@@ -48,7 +48,7 @@ export default defineComponent({
         return {
             lesson: {
                 name: '',
-                pages: [] as TPage[]
+                pages: [] as TLesson['pages']
             },
             updatedName: 'Lesson',
             pageStatus: PageStatus.loading
@@ -68,7 +68,7 @@ export default defineComponent({
     },
     created() {
         if (this.lessonId) {
-            request<TLessonResponse>(`/api/editor/lessons/${this.lessonId}`).then(({ data }) => {
+            request<TLesson>(`/api/editor/lessons/${this.lessonId}`).then(({ data }) => {
                 if (data) {
                     this.lesson = data
                     this.updatedName = data.name
@@ -118,7 +118,7 @@ export default defineComponent({
 
         removePage(pageId: TPageId) {
             request(`/api/editor/pages/${pageId}`, { method: 'delete' }).then(() => {
-                this.lesson.pages = this.lesson.pages.filter((page: TPage) => page._id !== pageId)
+                // this.lesson.pages = this.lesson.pages.filter<Omit<TPage, 'structure'>>((page: TPage) => page._id !== pageId)
             })
         }
     }

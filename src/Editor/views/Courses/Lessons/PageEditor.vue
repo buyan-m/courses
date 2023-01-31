@@ -1,35 +1,33 @@
 <template>
-    <TwoColumnsLayout>
-        <template #primary>
-            <HeadingEditable
-                :text="page.name"
-                @change="headingChangeHandler"
-            />
-            <CourseStepEditor
-                v-if="shouldWeShowEditor"
-                ref="editor"
-                :initial-page="initialPageStructure"
-                @save="editorReturnDataHandler"
-            />
-        </template>
-        <template #secondary>
-            <div>{{ $t('Pages') }}</div>
-        </template>
-    </TwoColumnsLayout>
+    <SingleColumnLayout v-loading="pageStatus === 'loading'">
+        <router-link :to="{name: 'editor-course-update', params: {courseId: $route.params.courseId}}">
+            back to course
+        </router-link>
+        <HeadingEditable
+            :text="page.name"
+            @change="headingChangeHandler"
+        />
+        <CourseStepEditor
+            v-if="shouldWeShowEditor"
+            ref="editor"
+            :initial-page="initialPageStructure"
+            @save="editorReturnDataHandler"
+        />
+    </SingleColumnLayout>
 </template>
 <script lang="ts">
 import { defineComponent } from 'vue'
 import CourseStepEditor from '@/Editor/components/CourseStepEditor/CourseStepEditor.vue'
-import TwoColumnsLayout from '@/layouts/columns/TwoColumnsLayout.vue'
 import HeadingEditable from '@/Editor/components/HeadingEditable/HeadingEditable.vue'
 import type { OutputData as TEditorOutputData } from '@editorjs/editorjs'
 import { PageStatus } from '@/constants/PageStatus'
 import request from '@/utils/request'
 import type { TPage, TPageCreateResponse } from '@/types/api/editor-responses'
+import SingleColumnLayout from '@/layouts/columns/SingleColumnLayout.vue'
 
 export default defineComponent({
     components: {
-        TwoColumnsLayout,
+        SingleColumnLayout,
         CourseStepEditor,
         HeadingEditable
     },
