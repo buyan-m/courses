@@ -5,8 +5,11 @@ export type TPageId = string
 export enum EditorBlockType {
     'paragraph' = 'paragraph',
     'heading' = 'heading',
+    'note' = 'note',
     'audio' = 'audio',
+    'video' = 'video',
     'radio' = 'radio',
+    'input' = 'input',
     'checkbox' = 'checkbox',
     'image' = 'image'
 }

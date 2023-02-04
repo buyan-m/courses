@@ -1,6 +1,7 @@
 import './styles.css'
 import type { BaseTool } from '@editorjs/editorjs'
 import type { TEditorBlockVideo } from '@/types/api/page-content'
+import { createYoutubeURL } from '@/utils/embeds'
 
 type TVideoConstructorParams = {
     data: TEditorBlockVideo['data']
@@ -29,7 +30,7 @@ export default class Video implements BaseTool {
         }
 
         const iframe = document.createElement('iframe')
-        iframe.src = `https://www.youtube.com/embed/${this.data.videoId}`
+        iframe.src = createYoutubeURL(this.data.videoId)
         return iframe
     }
 

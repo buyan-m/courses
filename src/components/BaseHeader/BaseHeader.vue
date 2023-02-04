@@ -4,54 +4,26 @@
         mode="horizontal"
     >
         <el-menu-item index="1">
-            Dewey.edu
+            ???
         </el-menu-item>
-        <el-sub-menu index="2">
-            <template #title>
-                Workspace
-            </template>
-            <el-menu-item index="2-1">
-                item one
-            </el-menu-item>
-            <el-menu-item index="2-2">
-                item two
-            </el-menu-item>
-            <el-menu-item index="2-3">
-                item three
-            </el-menu-item>
-            <el-sub-menu index="2-4">
-                <template #title>
-                    item four
-                </template>
-                <el-menu-item index="2-4-1">
-                    item one
-                </el-menu-item>
-                <el-menu-item index="2-4-2">
-                    item two
-                </el-menu-item>
-                <el-menu-item index="2-4-3">
-                    item three
-                </el-menu-item>
-            </el-sub-menu>
-        </el-sub-menu>
         <el-menu-item
-            index="3"
+            index="2"
         >
             <router-link :to="{name: 'viewer-home'}">
-                Курсы
+                {{ $t('courses') }}
             </router-link>
         </el-menu-item>
-        <el-menu-item index="4">
+        <el-menu-item index="3">
             <router-link :to="{name: 'editor-home'}">
-                Редактор
+                {{ $t('editor') }}
             </router-link>
         </el-menu-item>
         <div :class="$style.spacer" />
         <el-menu-item
-            index="5"
+            index="4"
             @click="logout"
         >
-            Выход
+            {{ $t('logout') }}
         </el-menu-item>
     </el-menu>
 </template>
@@ -73,3 +45,17 @@ export default {
     flex-grow: 1;
 }
 </style>
+<i18n>
+{
+    "en": {
+        "courses": "Courses",
+        "editor": "Editor",
+        "logout": "Logout"
+    },
+    "ru": {
+        "courses": "Курсы",
+        "editor": "Редактор",
+        "logout":  "Выход"
+    }
+}
+</i18n>

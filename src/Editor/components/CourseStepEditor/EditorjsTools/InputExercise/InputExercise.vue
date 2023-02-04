@@ -1,7 +1,7 @@
 <template>
     <el-form
         :class="$style.form"
-        @keydown.stop
+        @submit.prevent
     >
         <div :class="$style.answers">
             <el-tag

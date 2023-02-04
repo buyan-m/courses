@@ -16,7 +16,7 @@ import { defineComponent } from 'vue'
 import EditorJS from '@editorjs/editorjs'
 import type { OutputData } from '@editorjs/editorjs'
 // @ts-ignore
-import Header from '@editorjs/header'
+import Heading from '@editorjs/header'
 // @ts-ignore
 import List from '@editorjs/list'
 // @ts-ignore
@@ -41,7 +41,8 @@ export default defineComponent({
     data() {
         return {
             editorId: '',
-            editor: null as unknown as EditorJS
+            editor: null as unknown as EditorJS,
+            saveHandler: ((event: KeyboardEvent) => {})
         }
     },
 
@@ -54,7 +55,7 @@ export default defineComponent({
             this.editor = new EditorJS({
                 holder: this.editorId,
                 tools: {
-                    header: Header,
+                    heading: Heading,
                     list: List,
                     note: Note,
                     audio: Audio,
@@ -75,12 +76,24 @@ export default defineComponent({
                 data: this.initialPage as unknown as OutputData
             })
         })
+        this.saveHandler = this.lookForSave.bind(this)
+        document.addEventListener('keydown', this.saveHandler)
     },
+    beforeUnmount() {
+        document.removeEventListener('keydown', this.saveHandler)
+    },
+
     methods: {
         returnValue() {
             this.editor.save().then((data: OutputData) => {
                 this.$emit('save', data)
             })
+        },
+        lookForSave(event: KeyboardEvent) {
+            if ((event.metaKey || event.ctrlKey) && event.code === 'KeyS' && !event.shiftKey && !event.altKey) {
+                event.preventDefault()
+                this.returnValue()
+            }
         }
     }
 })

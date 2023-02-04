@@ -1,7 +1,7 @@
 <template>
     <el-form
         :class="$style.form"
-        @keydown.stop
+        @submit.prevent
     >
         <el-radio-group
             v-model="radioCheck"

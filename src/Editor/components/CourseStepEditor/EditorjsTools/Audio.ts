@@ -1,18 +1,6 @@
 import './styles.css'
-import request from '@/utils/request'
 import type { BaseTool } from '@editorjs/editorjs'
-
-type TSoundCloudResponse = {
-    author_name: string
-    author_url: string
-    description: string
-    height: number
-    html: string
-    provider_name: string
-    thumbnail_url: string
-    title: string
-    width: string
-}
+import { createSoundcloudEmbed } from '@/utils/embeds'
 
 type TAudioConstructorConfig = {
     data: {
@@ -43,11 +31,8 @@ export default class Audio implements BaseTool {
         const div = document.createElement('div')
         // но вообще генерацию html нужно на сервере хранить при добавлении элемента,
         // чтобы не борщить с вызовами api
-        request<TSoundCloudResponse>(`https://soundcloud.com/oembed?format=json&maxheight=80&url=${decodeURI(this.data.url)}`, {
-            headers: { 'Content-Type': 'text/plain' },
-            credentials: 'omit'
-        }).then((resp) => {
-            div.innerHTML = resp.data!.html
+        createSoundcloudEmbed(this.data.url).then((html) => {
+            div.innerHTML = html
         })
         return div
     }

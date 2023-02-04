@@ -1,7 +1,7 @@
 <template>
     <el-form
         :class="$style.form"
-        @keydown.stop
+        @submit.prevent
     >
         <el-form-item
             v-for="(option, index) in innerOptions"

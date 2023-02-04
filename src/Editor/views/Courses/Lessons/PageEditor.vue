@@ -1,5 +1,5 @@
 <template>
-    <SingleColumnLayout v-loading="pageStatus === 'loading'">
+    <SingleColumnLayout v-loading="pageStatus === 'loading' || pageStatus === 'updating'">
         <router-link :to="{name: 'editor-course-update', params: {courseId: $route.params.courseId}}">
             back to course
         </router-link>
@@ -58,7 +58,6 @@ export default defineComponent({
                     this.pageStatus = PageStatus.ready
                     this.page = { name: data.name, updatedName: data.name }
                 } else {
-                    console.error(errors)
                     this.pageStatus = PageStatus.error
                 }
             })
@@ -70,7 +69,7 @@ export default defineComponent({
         editorReturnDataHandler(content: TEditorOutputData) {
             const routeId = this.$route.params.pageId || 'create'
             const { lessonId } = this.$route.params
-
+            this.pageStatus = PageStatus.updating
             request<TPageCreateResponse>(
                 `/api/editor/pages/${routeId}`,
                 {
@@ -85,21 +84,19 @@ export default defineComponent({
                     })
                 }
             ).then(({ data, errors }) => {
+                this.pageStatus = PageStatus.ready
+
                 if (!this.$route.params.pageId && data) {
                     const { courseId } = this.$route.params
                     this.$router.push({ name: 'editor-lesson-update-page', params: { pageId: data.pageId, lessonId, courseId } })
                 }
                 if (errors.length) {
-                    console.error(errors)
+                    this.pageStatus = PageStatus.error
                 }
             })
         },
         headingChangeHandler(value: string) {
             this.page.updatedName = value
-        },
-        abortHeadingChanges() {
-            // ??
-            this.page.updatedName = this.page.name
         }
     }
 })
