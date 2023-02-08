@@ -9,9 +9,13 @@
             :class="$style.row"
         >
             <el-input
+                ref="input"
                 v-model="option.value"
                 type="text"
-                placeholder="option"
+                :placeholder="$t('option')"
+                @keydown.delete.stop
+                @keydown.enter.stop.prevent="addOption"
+                @keyup.enter.stop.prevent
             >
                 <template #prefix>
                     <el-checkbox v-model="option.isCorrect">
@@ -47,12 +51,19 @@ export default defineComponent({
         }
     },
     created() {
-        this.innerOptions = [...this.options] as TOption[]
+        this.innerOptions = (this.options as TOption[]).map((el, index) => ({ ...el }))
     },
     methods: {
         addOption() {
             this.innerOptions.push({
-                value: ''
+                value: '',
+                isCorrect: false
+            })
+            this.$nextTick().then(() => this.$nextTick()).then(() => {
+                const inputs = this.$refs.input as HTMLInputElement[]
+                if (inputs.length) {
+                    inputs[inputs.length - 1].focus()
+                }
             })
         },
         removeOption(index: number) {
@@ -71,3 +82,13 @@ export default defineComponent({
     width: 100%
 }
 </style>
+<i18n>
+{
+    "en":  {
+        "option": "Option"
+    },
+    "ru": {
+        "option": "Вариант"
+    }
+}
+</i18n>

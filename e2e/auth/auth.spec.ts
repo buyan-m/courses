@@ -7,7 +7,7 @@ import { fieldErrorClass } from '../constants/elements'
 test.describe('Auth', () => {
     test('Home page opened', async ({ page }) => {
         await page.goto(routes.homePage, { timeout: 10000 })
-        await expect(page.locator('span')).toHaveText('Greetings!')
+        await expect(page.locator('span')).toHaveText('Image by Drazen Zigic on Freepik')
     })
 
     test('Courses page was redirected to auth', async ({ page }) => {

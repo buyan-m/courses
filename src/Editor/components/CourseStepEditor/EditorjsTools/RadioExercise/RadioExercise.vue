@@ -3,33 +3,35 @@
         :class="$style.form"
         @submit.prevent
     >
-        <el-radio-group
-            v-model="radioCheck"
-            :class="$style.radioGroup"
+        <el-form-item
+            v-for="(option, index) in innerOptions"
+            :key="option"
+            :class="$style.row"
         >
-            <el-form-item
-                v-for="(option, index) in innerOptions"
-                :key="index"
-                :class="$style.row"
+            <el-input
+                ref="input"
+                v-model="option.value"
+                type="text"
+                :placeholder="$t('option')"
+                @keydown.delete.stop
+                @keydown.enter.stop.prevent="addOption"
+                @keyup.enter.stop.prevent
             >
-                <el-input
-                    v-model="option.value"
-                    type="text"
-                    placeholder="option"
-                >
-                    <template #prefix>
-                        <el-radio :label="index">
-                            <template />
-                        </el-radio>
-                    </template>
-                    <template #append>
-                        <el-button @click="removeOption(index)">
-                            x
-                        </el-button>
-                    </template>
-                </el-input>
-            </el-form-item>
-        </el-radio-group>
+                <template #prefix>
+                    <el-radio
+                        v-model="radioCheck"
+                        :label="index"
+                    >
+                        <template />
+                    </el-radio>
+                </template>
+                <template #append>
+                    <el-button @click="removeOption(index)">
+                        x
+                    </el-button>
+                </template>
+            </el-input>
+        </el-form-item>
         <el-button @click.prevent="addOption">
             +
         </el-button>
@@ -63,7 +65,7 @@ export default defineComponent({
         }
     },
     created() {
-        this.innerOptions = [...this.options] as TOption[]
+        this.innerOptions = (this.options as TOption[]).map((el) => ({ ...el }))
         this.radioCheck = this.innerOptions.findIndex((el: TOption) => el.isCorrect)
     },
     methods: {
@@ -72,8 +74,17 @@ export default defineComponent({
                 value: '',
                 isCorrect: false
             })
+            this.$nextTick().then(() => this.$nextTick()).then(() => {
+                const inputs = this.$refs.input as HTMLInputElement[]
+                if (inputs.length) {
+                    inputs[inputs.length - 1].focus()
+                }
+            })
         },
         removeOption(index: number) {
+            if (this.innerOptions[index].isCorrect) {
+                this.radioCheck = -1
+            }
             this.innerOptions.splice(index, 1)
         }
     }
@@ -93,3 +104,13 @@ export default defineComponent({
     width: 100%
 }
 </style>
+<i18n>
+{
+    "en":  {
+        "option": "Option"
+    },
+    "ru": {
+        "option": "Вариант"
+    }
+}
+</i18n>

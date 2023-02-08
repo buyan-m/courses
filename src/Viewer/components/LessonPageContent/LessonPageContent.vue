@@ -20,7 +20,7 @@ const $style = useCssModule()
 
 const CONVERTERS = {
     paragraph(data: { text: string }) {
-        return h('p', {}, data.text)
+        return h('p', { innerHTML: data.text })
     },
     heading(data: { text: string }) {
         return h('h2', {}, data.text)
@@ -32,7 +32,7 @@ const CONVERTERS = {
         } else {
             el = 'ul'
         }
-        return h(el, {}, data.items.map((text) => h('li', {}, text)))
+        return h(el, {}, data.items.map((text) => h('li', { innerHTML: text })))
     },
     note(data: { text: string }) {
         return h(NoteBlock, { text: data.text })

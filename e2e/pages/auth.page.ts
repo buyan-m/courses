@@ -17,8 +17,6 @@ export class AuthPage {
 
     readonly nameField: Locator
 
-    readonly errors: Locator
-
     readonly emailRow: Locator
 
     readonly passwordRow: Locator

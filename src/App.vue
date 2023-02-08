@@ -98,4 +98,7 @@ p {
     margin: 1rem 0;
     line-height: 1.7;
 }
+ul, ol {
+    padding:10px 40px;
+}
 </style>

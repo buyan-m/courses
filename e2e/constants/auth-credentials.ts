@@ -1,6 +1,6 @@
 export default {
     logIn: {
-        email: 'test@test.test',
+        email: 'autotest@test.test',
         password: 'qwerqwer'
     },
     create: {

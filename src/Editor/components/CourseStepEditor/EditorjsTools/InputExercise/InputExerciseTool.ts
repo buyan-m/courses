@@ -1,6 +1,8 @@
 import { createApp } from 'vue'
 import type { ComponentPublicInstance } from 'vue'
 import type { BaseTool } from '@editorjs/editorjs'
+import i18n from '@/i18n'
+import elementPlus from 'element-plus'
 import InputExerciseVue from './InputExercise.vue'
 
 type TInputComponent = ComponentPublicInstance<{}, {}, { correctAnswers: [] }>
@@ -28,7 +30,10 @@ export default class InputExerciseTool implements BaseTool {
             this.form = document.createElement('div')
             this.vueComponent = createApp(InputExerciseVue, {
                 answers: this.answers
-            }).mount(this.form) as TInputComponent
+            })
+                .use(i18n)
+                .use(elementPlus)
+                .mount(this.form) as TInputComponent
         }
         return this.form as HTMLElement
     }
