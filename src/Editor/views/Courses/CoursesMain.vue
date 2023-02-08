@@ -7,6 +7,7 @@
                 v-for="course in courses"
                 :key="course._id"
                 :course="course"
+                data-test="courseCard"
             />
         </section>
         <router-link :to="{name: 'editor-course-create'}">

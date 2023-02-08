@@ -1,6 +1,8 @@
 import { createApp } from 'vue'
 import type { ComponentPublicInstance } from 'vue'
 import type { BaseTool } from '@editorjs/editorjs'
+import i18n from '@/i18n'
+import elementPlus from 'element-plus'
 import CheckboxExerciseVue from './CheckboxExercise.vue'
 
 export type TOption = {
@@ -33,7 +35,10 @@ export default class CheckboxExerciseTool implements BaseTool {
             this.form = document.createElement('div')
             this.vueComponent = createApp(CheckboxExerciseVue, {
                 options: this.options
-            }).mount(this.form) as TCheckboxComponent
+            })
+                .use(i18n)
+                .use(elementPlus)
+                .mount(this.form) as TCheckboxComponent
         }
         return this.form as HTMLElement
     }

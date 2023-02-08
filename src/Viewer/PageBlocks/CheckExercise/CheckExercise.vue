@@ -17,7 +17,7 @@
 </template>
 <script lang="ts" setup>
 import { defineProps, ref, useCssModule } from 'vue'
-import type { TOption } from '@/types/api/exercises'
+import type { TOption } from '@/types/api/page-content'
 
 const $styles = useCssModule()
 const props = defineProps<{ options: TOption[] }>()

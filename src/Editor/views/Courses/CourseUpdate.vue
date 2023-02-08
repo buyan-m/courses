@@ -64,7 +64,7 @@ function saveCourse() {
     }
     changeCourseTimeout = setTimeout(() => {
         $store.saveCourse().then((courseId) => {
-            if (!routeCourseId.value) {
+            if (!routeCourseId.value && courseId) {
                 routeCourseId.value = courseId
                 $router.push({ name: 'editor-course-update', params: { courseId } })
             }

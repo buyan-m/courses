@@ -6,7 +6,7 @@
         <div :class="$style.answers">
             <el-tag
                 v-for="(answer, index) in correctAnswers"
-                :key="index"
+                :key="answer"
                 closable
                 @close="removeOption(index)"
             >
@@ -27,7 +27,8 @@
             v-model="inputValue"
             :class="$style.input"
             size="small"
-            @keyup.enter="handleInputConfirm"
+            @keydown.delete.stop
+            @keyup.enter.stop.prevent="handleInputConfirm"
             @blur="handleInputConfirm"
         />
     </el-form>

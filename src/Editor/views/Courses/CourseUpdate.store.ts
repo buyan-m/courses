@@ -20,10 +20,11 @@ export const useCourseUpdateStore = defineStore('courseUpdate', {
         courseUpdatePromise: new Promise(() => {}) as Promise<TCourseId>,
         courseId: '',
         courseStatus: CourseStatus.new,
-        courseUpdatedName: 'Create new course',
-        courseUpdatedDescription: 'Course description',
+        courseUpdatedName: 'Course\'s title',
+        courseUpdatedDescription: 'Course\'s description',
         course: {
-            name: 'Create new course',
+            name: 'Course\'s title',
+            description: 'Course\'s description',
             lessons: [getEmptyLesson()]
         } as TCourseStructure
     }),
@@ -115,10 +116,14 @@ export const useCourseUpdateStore = defineStore('courseUpdate', {
                     description: this.courseUpdatedDescription
                 })
             })
-                .then(({ data }) => {
-                    this.courseStatus = CourseStatus.created
-                    this.courseId = data!.courseId
-                    return this.courseId
+                .then(({ data, errors }) => {
+                    if (!errors.length) {
+                        this.courseStatus = CourseStatus.created
+                        this.courseId = data!.courseId
+                        return this.courseId
+                    }
+                    this.courseStatus = this.courseId ? CourseStatus.created : CourseStatus.new
+                    return ''
                 })
 
             return this.courseUpdatePromise

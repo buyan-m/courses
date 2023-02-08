@@ -5,6 +5,7 @@
             :key="index"
             :class="$style.lesson"
             shadow="never"
+            data-test="lessonCard"
         >
             <el-input
                 v-model="lesson.name"

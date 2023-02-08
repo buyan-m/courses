@@ -1,9 +1,9 @@
 import {
     readFileSync, writeFileSync
-} from 'fs'
+} from 'node:fs'
 import axios from 'axios'
-import * as path from 'path'
-import * as https from 'https'
+import * as path from 'node:path'
+import * as https from 'node:https'
 import authCredentials from './constants/auth-credentials'
 
 let preservedData = {
@@ -25,8 +25,9 @@ function getNewToken() {
         .then((resp) => {
             const cookie = resp.headers['set-cookie']
             if (cookie && cookie[0]) {
-                const token = cookie[0].split(';')[0]
-                writeFileSync(path.resolve(__dirname, './data.json'), JSON.stringify({ authToken: token }))
+                const token = cookie[0].split(';')[0].replace('token=', '')
+                preservedData.authToken = token
+                writeFileSync(path.resolve(__dirname, './data.json'), JSON.stringify(preservedData))
             } else {
                 throw new Error('There is no token in response')
             }
@@ -38,7 +39,10 @@ function getNewToken() {
 }
 
 if (preservedData.authToken) {
-    axiosInstance.get('https://localhost:8080/api/auth-check', { headers: { cookie: preservedData.authToken } })
+    axiosInstance.get(
+        'https://localhost:8080/api/auth-check',
+        { headers: { cookie: `token=${preservedData.authToken}` } }
+    )
         .then((resp) => {
             if (resp.status !== 200) {
                 getNewToken()

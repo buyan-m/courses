@@ -1,6 +1,6 @@
 <template>
     <el-menu
-        class="el-menu-demo"
+        :class="$style.menu"
         mode="horizontal"
     >
         <el-menu-item index="1">
@@ -43,6 +43,9 @@ export default {
 <style module>
 .spacer {
     flex-grow: 1;
+}
+.menu {
+    padding: 0 0
 }
 </style>
 <i18n>

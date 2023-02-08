@@ -2,6 +2,8 @@ import { createApp } from 'vue'
 import type { ComponentPublicInstance } from 'vue'
 import type { BaseTool } from '@editorjs/editorjs'
 import type { TOption } from '@/types/api/page-content'
+import i18n from '@/i18n'
+import elementPlus from 'element-plus'
 import RadioExerciseVue from './RadioExercise.vue'
 
 type TRadioComponent = ComponentPublicInstance<{}, {}, { innerOptions: [] }>
@@ -29,7 +31,10 @@ export default class RadioExerciseTool implements BaseTool {
             this.form = document.createElement('div')
             this.vueComponent = createApp(RadioExerciseVue, {
                 options: this.options
-            }).mount(this.form) as TRadioComponent
+            })
+                .use(i18n)
+                .use(elementPlus)
+                .mount(this.form) as TRadioComponent
         }
         return this.form as HTMLElement
     }

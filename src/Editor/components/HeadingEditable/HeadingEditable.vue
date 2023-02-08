@@ -1,8 +1,12 @@
 <template>
-    <h1
-        ref="element"
-        contenteditable="true"
-    />
+    <div :class="$style.heading">
+        ✏️
+        <h1
+            ref="element"
+            :class="$style.contentEditable"
+            contenteditable="true"
+        />
+    </div>
 </template>
 <script setup lang="ts">
 import {
@@ -25,3 +29,14 @@ onMounted(() => {
 })
 
 </script>
+<style module>
+.heading {
+    display: flex;
+    align-items: center;
+    padding-bottom: 20px;
+}
+
+.contentEditable {
+    flex-basis: 100%;
+}
+</style>

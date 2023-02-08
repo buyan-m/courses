@@ -46,11 +46,12 @@ export default defineComponent({
         }
     },
 
-    mounted() {
+    created() {
         const random = Math.ceil(Math.random() * 10000)
-
         this.editorId = `editor_${random}`
+    },
 
+    mounted() {
         this.$nextTick(() => {
             this.editor = new EditorJS({
                 holder: this.editorId,
@@ -76,6 +77,7 @@ export default defineComponent({
                 data: this.initialPage as unknown as OutputData
             })
         })
+
         this.saveHandler = this.lookForSave.bind(this)
         document.addEventListener('keydown', this.saveHandler)
     },
