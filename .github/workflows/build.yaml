@@ -30,6 +30,8 @@ jobs:
   docker:
     runs-on: ubuntu-latest
     needs: build
+    outputs:
+      image: ${{ steps.image.outputs.image }}
     environment: docker
     steps:
       - uses: actions/download-artifact@v3
@@ -37,8 +39,12 @@ jobs:
           name: build
 
       - name: create tag
+        id: image
+        run: echo image=$(date '+%Y-%m-%d_%H-%M') >> $GITHUB_OUTPUT
+
+      - name: create image name
         id: tag
-        run: echo tag=ghcr.io/${{ vars.DOCKER_USER }}/${{ vars.DOCKER_IMAGE_NAME }}:$(date '+%Y-%m-%d_%H-%M') >> $GITHUB_OUTPUT
+        run: echo tag=ghcr.io/${{ vars.DOCKER_USER }}/${{ vars.DOCKER_IMAGE_NAME }}:${{ steps.image.outputs.image }} >> $GITHUB_OUTPUT
 
       - name: docker build
         run: docker build -f .Dockerfile ./dist -t ${{ steps.tag.outputs.tag }}
@@ -52,3 +58,14 @@ jobs:
 
       - name: docker push
         run: docker push ${{ steps.tag.outputs.tag }}
+
+  deploy:
+    runs-on: ubuntu-latest
+    environment: deploy
+    needs: docker
+    steps:
+      - run: echo "${{ secrets.SSH_KEY }}" >> ssh_key
+      - run: chmod 600 ssh_key
+      - run: ssh -o StrictHostKeyChecking=no -i ssh_key ${{ secrets.DROPLET }} "sed -i 's/^STATIC_TAG=.*/STATIC_TAG=${{needs.docker.outputs.image}}/' ~/app/.env"
+      - run: ssh -o StrictHostKeyChecking=no -i ssh_key ${{ secrets.DROPLET }} "cd ~/app && docker compose up -d"
+      - run: rm ssh_key
