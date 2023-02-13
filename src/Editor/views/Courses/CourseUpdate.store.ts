@@ -18,6 +18,7 @@ function getEmptyLesson(): TLesson {
 export const useCourseUpdateStore = defineStore('courseUpdate', {
     state: () => ({
         courseUpdatePromise: new Promise(() => {}) as Promise<TCourseId>,
+        savingLessons: {} as Record<string, Promise<void | undefined> | undefined>,
         courseId: '',
         courseStatus: CourseStatus.new,
         courseUpdatedName: 'Course\'s title',
@@ -53,14 +54,16 @@ export const useCourseUpdateStore = defineStore('courseUpdate', {
             this.courseUpdatedDescription = description
         },
 
-        saveLesson(lesson: TLesson) {
+        async saveLesson(lesson: TLesson): Promise<void | undefined> {
             if (this.courseStatus === CourseStatus.new || this.courseStatus === CourseStatus.requesting) {
-                return this.saveCourse().then(() => {
-                    this.saveLesson(lesson)
-                })
+                return this.saveCourse().then(() => this.saveLesson(lesson))
             }
 
             const lessonId = lesson._id || 'create'
+
+            if (this.savingLessons[lessonId]) {
+                await this.savingLessons[lessonId]
+            }
 
             const lessonDTO = {
                 name: lesson.name,
@@ -71,7 +74,7 @@ export const useCourseUpdateStore = defineStore('courseUpdate', {
                 lessonDTO._id = lesson._id
             }
 
-            return request<TLessonCreateResponse>(
+            this.savingLessons[lessonId] = request<TLessonCreateResponse>(
                 `/api/editor/lessons/${lessonId}`,
                 {
                     method: 'POST',
@@ -81,6 +84,8 @@ export const useCourseUpdateStore = defineStore('courseUpdate', {
                     body: JSON.stringify(lessonDTO)
                 }
             ).then(({ data }) => {
+                this.savingLessons[lessonId] = undefined
+
                 if (data && lesson._id === '') {
                     const index = this.course.lessons.findIndex(({ _id }: TLesson) => _id === lesson._id)
                     this.course.lessons[index] = {
@@ -91,6 +96,8 @@ export const useCourseUpdateStore = defineStore('courseUpdate', {
                     this.course.lessons.push(getEmptyLesson())
                 }
             })
+
+            return this.savingLessons[lessonId]
         },
 
         saveCourse(): Promise<TCourseId> {
