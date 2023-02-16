@@ -41,6 +41,7 @@
                 type="password"
                 data-test="auth.password"
                 autocomplete="new-password"
+                @keydown.enter="register"
             />
         </el-form-item>
         <div :class="$style.footer">

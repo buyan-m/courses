@@ -1,5 +1,6 @@
 <template>
     <div :class="$style.formWrapper">
+        <OkulLogo :class="$style.logo" />
         <AuthForm
             v-if="mode === ModeEnum.auth"
             :errors="authErrors"
@@ -20,6 +21,7 @@ import AuthForm from '@/Basic/components/AuthForm/AuthForm.vue'
 import request from '@/utils/request'
 import RegisterForm from '@/Basic/components/RegisterForm/RegisterForm.vue'
 import { RouteLocationRaw } from 'vue-router'
+import OkulLogo from '@/components/OkulLogo/OkulLogo.vue'
 
 enum Mode {
     'auth' = 'auth',
@@ -28,7 +30,7 @@ enum Mode {
 }
 
 export default defineComponent({
-    components: { RegisterForm, AuthForm },
+    components: { OkulLogo, RegisterForm, AuthForm },
     data() {
         return {
             mode: Mode.auth as Mode,
@@ -89,8 +91,15 @@ export default defineComponent({
 <style module>
 .formWrapper {
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     height: 100%;
+}
+.logo {
+    fill: var(--el-text-color-regular);
+    width: 100px;
+    height: auto;
+    margin-bottom: 40px;
 }
 </style>
