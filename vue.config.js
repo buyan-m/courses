@@ -13,8 +13,7 @@ module.exports = defineConfig({
         },
         proxy: {
             '^/api': {
-                target: 'http://0.0.0.0:3000/',
-                pathRewrite: { '^/api': '' },
+                target: 'https://okul.one/',
             },
         },
     },

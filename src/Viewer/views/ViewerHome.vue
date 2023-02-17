@@ -1,23 +1,24 @@
 <template>
     <SingleColumnLayout v-loading="pageStatus === 'loading'">
-        <ul>
-            <li
+        <h2>{{ $t('featured') }}</h2>
+        <div :class="$style.featuredCourses">
+            <CourseCard
                 v-for="course in featuredCourses"
                 :key="course._id"
-            >
-                <router-link
-                    :to="{name: 'viewer-course', params: {courseId: course.course.id}}"
-                >
-                    {{ course.name }}
-                    {{ `${Math.floor(course.progress * 100)}%` }}
-                </router-link>
-            </li>
-        </ul>
+                :course="course"
+            />
+        </div>
+        <h2>{{ $t('search') }}</h2>
         <el-input
             v-model="searchText"
             :class="$style.searchField"
-            placeholder="Course name or description"
-        />
+            :placeholder="$t('search-placeholder')"
+        >
+            <template #prefix>
+                🔍
+            </template>
+        </el-input>
+
         <div :class="$style.searchedCourses">
             <CourseCard
                 v-for="course in searchedCourses"
@@ -65,7 +66,7 @@ export default defineComponent({
     created() {
         request<TCourseStructure[]>('/api/viewer/courses/featured').then(({ data, errors }) => {
             if (!errors.length) {
-                this.featuredCourses = data!
+                // this.featuredCourses = data!
                 this.pageStatus = PageStatus.ready
             } else {
                 this.pageStatus = PageStatus.error
@@ -102,7 +103,27 @@ export default defineComponent({
     gap: 20px;
     flex-wrap: wrap;
 }
+.featuredCourses {
+    padding-bottom: 20px;
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
 .searchField {
     margin-bottom: 20px;
 }
 </style>
+<i18n>
+{
+    "ru": {
+        "search-placeholder": "Поиск по имени или описанию курса",
+        "featured": "Актуальные курсы",
+        "search": "Поиск"
+    },
+    "en": {
+        "search-placeholder": "Search for course name or description",
+        "featured": "Popular courses",
+        "search": "Search"
+    }
+}
+</i18n>

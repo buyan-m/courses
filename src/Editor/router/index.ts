@@ -15,11 +15,6 @@ export default {
             path: 'courses',
             children: [
                 {
-                    path: '',
-                    name: 'editor-courses-main',
-                    component: () => import('@/Editor/views/Courses/CoursesMain.vue')
-                },
-                {
                     path: 'create',
                     name: 'editor-course-create',
                     component: () => import('@/Editor/views/Courses/CourseUpdate.vue')

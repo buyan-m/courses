@@ -8,12 +8,12 @@
                         {{ $t('slogan') }}
                     </div>
                 </div>
-                <div :class="$style.card">
+                <div :class="$style.leadText">
                     {{ $t('mission') }}
                 </div>
                 <router-link :to="{name: 'viewer-home'}">
                     <button
-                        :class="$style.actionButton"
+                        :class="`${$style.actionButton} ${$style.actionButtonFloating}`"
                     >
                         {{ $t('start') }}
                     </button>
@@ -21,33 +21,47 @@
             </div>
         </div>
         <span :class="$style.imageNotice"><a
+            target="_blank"
+            rel="nofollow"
             href="https://www.freepik.com/free-photo/empty-classroom-due-coronavirus-pandemic_26606670.htm#query=empty%20classroom&position=0&from_view=search&track=sph"
         >Image by Drazen Zigic</a> on Freepik</span>
     </section>
-    <section :class="$style.teachersroom">
-        <div :class="$style.lead">
-            <div :class="$style.wrapper">
-                <div :class="`${$style.card} ${$style.cardReverse}`">
+    <section :class="$style.wrapper">
+        <div :class="$style.teachersroom">
+            <div :class="$style.teachersDescription">
+                <p :class="$style.teachersText">
                     {{ $t('to-teachers') }}
-                </div>
+                </p>
                 <router-link :to="{name: 'editor-home'}">
-                    <button
-                        :class="`${$style.actionButton} ${$style.buttonReverse}`"
-                    >
+                    <button :class="$style.actionButton">
                         {{ $t('create') }}
                     </button>
                 </router-link>
             </div>
+
+            <div :class="$style.teachersImage">
+                <span :class="$style.imageNotice">
+                    <a
+                        target="_blank"
+                        rel="nofollow"
+                        href="https://www.freepik.com/free-photo/lateral-foreground-working-desk-with-laptop-cup-coffee-eyeglasses-stationery_6449756.htm#page=5&query=education&position=3&from_view=search&track=sph"
+                    >Image by freepic.diller</a> on Freepik</span>
+            </div>
         </div>
-        <span :class="$style.imageNotice">
-            <a href="https://www.freepik.com/free-photo/pan-shot-empty-office-with-projector-middle-conference-desk_5766977.htm#query=empty%20classsroom&position=30&from_view=search&track=ais">Image by pressfoto</a>
-            on Freepik</span>
     </section>
-    <section :class="$style.featureWrapper">
+    <section :class="$style.aimsWrapper">
+        <div :class="$style.wrapper">
+            <h2 :class="$style.heading">
+                {{ $t('aims') }}
+            </h2>
+            <p>{{ $t('what\'s-it') }}</p>
+        </div>
+    </section>
+    <div :class="$style.wrapper">
         <h2 :class="$style.heading">
             {{ $t('try') }}<OkulLogo :class="$style.smallLogo" />
         </h2>
-    </section>
+    </div>
 
     <section :class="$style.featureWrapper">
         <div :class="$style.featureCard">
@@ -105,34 +119,26 @@ export default defineComponent({
     height: 420px;
     position: relative;
 }
-.teachersroom {
-    background: url('@/assets/room.jpg') no-repeat center center;
-    height: 420px;
-    position: relative;
-}
-
 .mainLogo {
-    width: 240px;
+    width: 170px;
     height: auto;
     fill: #ffffff;
     vertical-align: middle;
 }
 .smallLogo {
-    width: 100px;
+    width: 92px;
     height: 43px;
     fill: var(--el-text-color-regular);
     vertical-align: text-top;
 }
 .lead {
-    background-color: rgba(0,0,0,0.4);
+    background-color: rgba(0,0,0,0.55);
     height: 420px;
     padding-top: 100px;
-
 }
 
 .wrapper {
     width: 1000px;
-    min-height: 230px;
     margin: 0 auto;
     position: relative;
     display: flex;
@@ -143,13 +149,13 @@ export default defineComponent({
     display: inline-block;
     color: #ffffff;
     font-size: 56px;
-    line-height: 85px;
-    padding-left: 22px;
+    line-height: 70px;
+    padding-left: 20px;
     vertical-align: bottom;
 }
 
 .opening {
-    line-height: 100px;
+    line-height: 85px;
 }
 
 .imageNotice {
@@ -157,11 +163,10 @@ export default defineComponent({
     bottom: 0;
     right: 0;
     color: #ffffff;
-    padding-left: 10px;
-    padding-right: 10px;
-
+    padding: 8px 16px;
+    font-size: 13px;
 }
-.card {
+.leadText {
     display: inline-block;
     font-size: 32px;
     margin-top: 30px;
@@ -169,12 +174,30 @@ export default defineComponent({
     white-space: pre-line;
     width: 780px;
 }
-
-.cardReverse {
-    text-align: right;
-    align-self: end;
+.teachersroom {
+    display: flex;
+    justify-content: space-between;
+    padding: 80px 0 40px;
+    gap: 40px;
+}
+.teachersDescription {
+    display: inline-block;
+    font-size: 28px;
+    color: var(--el-text-color-primary);
+    white-space: pre-line;
 }
 
+.teachersText {
+    line-height: normal;
+}
+.teachersImage {
+    background: url('@/assets/creation.jpg') no-repeat center center / cover;
+    position: relative;
+    flex: 0 0 400px
+}
+.aimsWrapper {
+    padding: 40px 20px;
+}
 .featureWrapper {
     padding: 20px;
     display: flex;
@@ -203,33 +226,32 @@ export default defineComponent({
 
 .actionButton {
     border: 0;
-    border-radius: 5px;
+    border-radius: 0;
     font-size: 30px;
-    background: var(--el-color-primary);
+    background: #1d76ff;
     color: #ffffff;
     padding: 10px 40px;
-    text-transform: uppercase;
+    letter-spacing: 0.7px;
+}
+.actionButtonFloating {
     position: absolute;
     right: 0;
     bottom: 0;
 }
 .actionButton:hover {
-    background: var(--el-color-primary-light-3);
+    background: #3a80f3;
 }
 .actionButton:active {
-    background: var(--el-color-primary-dark-2);
+    background: #185ed2;
 }
-.buttonReverse {
-    right: auto;
-    left: 0;
-}
-
 </style>
 <i18n>
 {
     "ru": {
         "slogan": "– узнай всё!",
         "mission": "Наша миссия – сделать образование доступным для каждого",
+        "start": "Начать",
+        "create": "Создать",
         "to-teachers": "Для учителей и методистов есть возможность создавать уникальные, востребованные курсы, проверять гипотезы в образовании не дожидаясь печати новых учебников.",
         "try": "Почему стоит попробовать ",
         "free": "Бесплатно ",
@@ -237,11 +259,15 @@ export default defineComponent({
         "community":  "Сообщество",
         "community-descr": "Каждый может создать свой курс и вести по нему учеников. Единственное ограничение - курс не должен нарушать местное законодательство и политики платформы",
         "a11y":  "Доступность",
-        "a11y-descr": "Для работы на платформе потребуется лишь доступ в интернет и устройство с относительно современным браузером."
+        "a11y-descr": "Для работы на платформе потребуется лишь доступ в интернет и устройство с относительно современным браузером.",
+        "what's-it": "Okul (“школа” на турецком). Проект служит одной цели - сделать образование доступным. Образование открывает двери к реализации любых человеческих фантазий. Жажда к знаниям является одним из важнейших столпов человечества. Мы верим, что через просвещение человечество может победить любые проблемы, поэтому критически важно обеспечить людей качественным образованием. Проект не сможет существовать без энтузиастов, заводящих сюда курсы и рассказывающих о них своим ученикам.",
+        "aims": "Наши цели"
     },
     "en": {
         "slogan": "– learn everything!",
         "mission": "Our mission is to make education affordable\nfor every person",
+        "start": "Start",
+        "create": "Create",
         "to-teachers": "We offer an opportunity to create unique, relevant courses, test educational hypotheses without waiting for new schoolbooks to get printed",
         "try": "Why you should try ",
         "free":  "Free to use",
@@ -249,7 +275,9 @@ export default defineComponent({
         "community":  "Driven by the people to the people",
         "community-descr": "Everyone can create their own courses and teach students with them. Only one restriction: the course should not violate local law and platform policies.",
         "a11y":  "Accessibility",
-        "a11y-descr": "Everything you need  - access to the internet and device with a modern enough browser."
+        "a11y-descr": "Everything you need  - access to the internet and device with a modern enough browser.",
+        "what's-it": "Okul (“school” in Turkish). The project’s ultimate goal - make education affordable. Knowledge opens doors to implement any human’s dreams. Thirst for knowledge is one of the most crucial pillars of humanity. We believe that through enlightenment humans can beat any issue, that’s why it is critical to provide people with quality education. The project would not exist without enthusiasts, who create courses here and share them with students.",
+        "aims": "Our aims"
     }
 }
 </i18n>
