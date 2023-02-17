@@ -1,6 +1,7 @@
 export type TCourseId = string
 export type TLessonId = string
 export type TPageId = string
+export type TUserId = string
 
 export enum EditorBlockType {
     'paragraph' = 'paragraph',

@@ -1,14 +1,14 @@
 <template>
-    <EditorBasicLayout>
+    <ViewerBasicLayout>
         <router-view />
-    </EditorBasicLayout>
+    </ViewerBasicLayout>
 </template>
 <script lang="ts">
-import EditorBasicLayout from '@/Viewer/layouts/ViewerLayout.vue'
+import ViewerBasicLayout from '@/Viewer/layouts/ViewerLayout.vue'
 
 export default {
     components: {
-        EditorBasicLayout
+        ViewerBasicLayout
     }
 }
 </script>

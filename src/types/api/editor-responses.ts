@@ -1,5 +1,6 @@
+import { Role } from '@/constants/Role'
 import type {
-    TCourseId, TLessonId, TPageId, TEditorBlock
+    TCourseId, TUserId, TLessonId, TPageId, TEditorBlock
 } from './common'
 
 export type TCourseStructure = {
@@ -42,3 +43,7 @@ export type TPageCreateResponse = {
 
 export type TLessonsList = TLesson[]
 export type TPagesList = TPage[]
+export type TAuthCheckResponse = {
+    userId: TUserId,
+    roles: Role[]
+}

@@ -1,17 +1,26 @@
 <template>
     <div :class="$style.background">
-        <EditorHeader />
+        <EditorHeader
+            :warning="warning"
+        />
         <div :class="$style.container">
             <slot />
         </div>
     </div>
 </template>
 <script lang="ts">
+import { defineComponent } from 'vue'
 import EditorHeader from '@/Editor/components/EditorHeader/EditorHeader.vue'
 
-export default {
-    components: { EditorHeader }
-}
+export default defineComponent({
+    components: { EditorHeader },
+    props: {
+        warning: {
+            type: String,
+            default: ''
+        }
+    }
+})
 </script>
 <style module>
 .container {

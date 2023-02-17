@@ -25,8 +25,14 @@
             </router-link>
         </el-menu-item>
         <div :class="$style.spacer" />
+        <div
+            v-if="warning"
+            :class="$style.warning"
+        >
+            {{ warning }}
+        </div>
         <el-menu-item
-            index="4"
+            index="5"
             @click="logout"
         >
             {{ $t('logout') }}
@@ -34,11 +40,18 @@
     </el-menu>
 </template>
 <script lang="ts">
+import { defineComponent } from 'vue'
 import request from '@/utils/request'
 import OkulLogo from '@/components/OkulLogo/OkulLogo.vue'
 
-export default {
+export default defineComponent({
     components: { OkulLogo },
+    props: {
+        warning: {
+            type: String,
+            default: ''
+        }
+    },
     methods: {
         logout() {
             request('/api/logout').then(() => {
@@ -46,7 +59,7 @@ export default {
             })
         }
     }
-}
+})
 </script>
 <style module>
 .spacer {
@@ -63,6 +76,14 @@ export default {
 }
 .item {
     font-size: 20px
+}
+
+.warning {
+    padding: 0 10px;
+    display: flex;
+    align-items: center;
+    background-color: var(--el-color-warning-light-7);
+    white-space: pre-line;
 }
 </style>
 <i18n>
