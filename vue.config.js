@@ -5,7 +5,7 @@ const { ElementPlusResolver } = require('unplugin-vue-components/resolvers')
 
 module.exports = defineConfig({
     transpileDependencies: true,
-
+    publicPath: '/static',
     devServer: {
         https: {
             key: '../https/rootCA.key',
@@ -13,7 +13,8 @@ module.exports = defineConfig({
         },
         proxy: {
             '^/api': {
-                target: 'https://okul.one/',
+                target: 'http://0.0.0.0:3000/',
+                pathRewrite: { '^/api': '' },
             },
         },
     },
