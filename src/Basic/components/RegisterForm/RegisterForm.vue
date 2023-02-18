@@ -17,7 +17,7 @@
             <el-input
                 v-model="registerForm.name"
                 data-test="auth.name"
-                autocomplete="username"
+                autocomplete="given-name"
             />
         </el-form-item>
         <el-form-item
