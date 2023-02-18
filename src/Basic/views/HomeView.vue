@@ -4,9 +4,6 @@
             <div :class="$style.wrapper">
                 <div :class="$style.opening">
                     <OkulLogo :class="$style.mainLogo" />
-                    <div :class="$style.slogan">
-                        {{ $t('slogan') }}
-                    </div>
                 </div>
                 <div :class="$style.leadText">
                     {{ $t('mission') }}
@@ -57,36 +54,38 @@
             <p>{{ $t('what\'s-it') }}</p>
         </div>
     </section>
-    <div :class="$style.wrapper">
-        <h2 :class="$style.heading">
-            {{ $t('try') }}<OkulLogo :class="$style.smallLogo" />
-        </h2>
-    </div>
 
     <section :class="$style.featureWrapper">
-        <div :class="$style.featureCard">
-            <h3 :class="$style.featureHeading">
-                {{ $t('free') }}
-            </h3>
-            <p>
-                {{ $t('free-descr') }}
-            </p>
+        <div :class="$style.wrapper">
+            <h2 :class="$style.heading">
+                {{ $t('try') }}<OkulLogo :class="$style.smallLogo" />
+            </h2>
         </div>
-        <div :class="$style.featureCard">
-            <h3 :class="$style.featureHeading">
-                {{ $t('community') }}
-            </h3>
-            <p>
-                {{ $t('community-descr') }}
-            </p>
-        </div>
-        <div :class="$style.featureCard">
-            <h3 :class="$style.featureHeading">
-                {{ $t('a11y') }}
-            </h3>
-            <p>
-                {{ $t('a11y-descr') }}
-            </p>
+        <div :class="$style.featureList">
+            <div :class="$style.featureCard">
+                <h3 :class="$style.featureHeading">
+                    {{ $t('free') }}
+                </h3>
+                <p>
+                    {{ $t('free-descr') }}
+                </p>
+            </div>
+            <div :class="$style.featureCard">
+                <h3 :class="$style.featureHeading">
+                    {{ $t('community') }}
+                </h3>
+                <p>
+                    {{ $t('community-descr') }}
+                </p>
+            </div>
+            <div :class="$style.featureCard">
+                <h3 :class="$style.featureHeading">
+                    {{ $t('a11y') }}
+                </h3>
+                <p>
+                    {{ $t('a11y-descr') }}
+                </p>
+            </div>
         </div>
     </section>
     <section :class="$style.featureWrapper">
@@ -115,47 +114,57 @@ export default defineComponent({
 </script>
 <style module>
 .classroom {
-    background: url('@/assets/empty-classroom.jpg') no-repeat center center;
+    background: url('@/assets/empty-classroom.jpg') no-repeat 50% 37%;
     height: 420px;
     position: relative;
 }
+
+@media screen and (max-width: 1000px) {
+    .classroom {
+        background-position: 80% 35%;
+        height: auto;
+    }
+}
+
 .mainLogo {
     width: 170px;
     height: auto;
     fill: #ffffff;
     vertical-align: middle;
 }
-.smallLogo {
-    width: 92px;
-    height: 43px;
-    fill: var(--el-text-color-regular);
-    vertical-align: text-top;
+@media screen and (max-width: 1000px) {
+    .mainLogo {
+        width: 140px;
+    }
 }
+
 .lead {
     background-color: rgba(0,0,0,0.55);
     height: 420px;
     padding-top: 100px;
 }
-
+@media screen and (max-width: 1000px) {
+    .lead {
+        height: auto;
+        padding: 30px;
+    }
+}
 .wrapper {
     width: 1000px;
+    max-width: 100%;
     margin: 0 auto;
     position: relative;
     display: flex;
     flex-direction: column;
 }
 
-.slogan {
-    display: inline-block;
-    color: #ffffff;
-    font-size: 56px;
-    line-height: 70px;
-    padding-left: 20px;
-    vertical-align: bottom;
-}
-
 .opening {
     line-height: 85px;
+}
+@media screen and (max-width: 1000px) {
+    .opening {
+        line-height: 50px;
+    }
 }
 
 .imageNotice {
@@ -173,55 +182,14 @@ export default defineComponent({
     color: #ffffff;
     white-space: pre-line;
     width: 780px;
-}
-.teachersroom {
-    display: flex;
-    justify-content: space-between;
-    padding: 80px 0 40px;
-    gap: 40px;
-}
-.teachersDescription {
-    display: inline-block;
-    font-size: 28px;
-    color: var(--el-text-color-primary);
-    white-space: pre-line;
+    max-width: 100%;
 }
 
-.teachersText {
-    line-height: normal;
-}
-.teachersImage {
-    background: url('@/assets/creation.jpg') no-repeat center center / cover;
-    position: relative;
-    flex: 0 0 400px
-}
-.aimsWrapper {
-    padding: 40px 20px;
-}
-.featureWrapper {
-    padding: 20px;
-    display: flex;
-    justify-content: center;
-}
-.featureCard {
-    width: 450px;
-    height: 300px;
-    padding: 40px;
-    border: var(--el-border);
-    font-size: var(--el-font-size-large);
-    margin-left: 20px;
-    margin-right: 20px
-}
-.featureHeading {
-    font-size: var(--el-font-size-extra-large);
-    padding-bottom: 20px;
-}
-.heading {
-    font-size: 40px
-}
-
-.start {
-    text-align:center;
+@media screen and (max-width: 1000px) {
+    .leadText {
+        font-size: 26px;
+        padding-bottom: 30px;
+    }
 }
 
 .actionButton {
@@ -233,10 +201,12 @@ export default defineComponent({
     padding: 10px 40px;
     letter-spacing: 0.7px;
 }
-.actionButtonFloating {
-    position: absolute;
-    right: 0;
-    bottom: 0;
+@media screen and (min-width: 1000px) {
+    .actionButtonFloating {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+    }
 }
 .actionButton:hover {
     background: #3a80f3;
@@ -244,11 +214,128 @@ export default defineComponent({
 .actionButton:active {
     background: #185ed2;
 }
+
+.teachersroom {
+    display: flex;
+    justify-content: space-between;
+    padding: 80px 0 40px;
+    gap: 40px;
+}
+@media screen and (max-width: 1000px) {
+    .teachersroom {
+        flex-direction: column;
+        padding: 30px 30px 15px;
+    }
+}
+
+.teachersDescription {
+    display: inline-block;
+    font-size: 28px;
+    color: var(--el-text-color-primary);
+    white-space: pre-line;
+}
+
+.teachersText {
+    line-height: normal;
+}
+@media screen and (max-width: 1000px) {
+    .teachersText {
+        margin-bottom: 30px;
+    }
+}
+
+.teachersImage {
+    background: url('@/assets/creation.jpg') no-repeat center center / cover;
+    position: relative;
+    flex: 0 0 400px
+}
+
+@media screen and (max-width: 1000px) {
+    .teachersImage {
+        display: none;
+    }
+}
+.aimsWrapper {
+    padding: 40px 20px;
+}
+
+@media screen and (max-width: 1000px) {
+    .aimsWrapper {
+        padding: 15px 30px;
+    }
+}
+.heading {
+    font-size: 40px;
+}
+@media screen and (max-width: 1000px) {
+    .heading {
+        font-size: 28px;
+        margin-bottom: 0;
+        text-align: center;
+    }
+}
+.smallLogo {
+    width: 92px;
+    height: 43px;
+    fill: var(--el-text-color-regular);
+    vertical-align: text-top;
+}
+@media screen and (max-width: 1000px) {
+    .smallLogo {
+        width: 70px;
+        height: 32px;
+    }
+}
+.featureWrapper {
+    padding: 20px;
+}
+@media screen and (max-width: 1000px) {
+    .featureWrapper {
+        padding: 15px 30px;
+    }
+}
+.featureList {
+    display: flex;
+    justify-content: center;
+    margin-top: 40px;
+}
+
+@media screen and (max-width: 1000px) {
+    .featureList {
+        flex-direction: column;
+        gap: 15px;
+        margin-top: 30px;
+    }
+}
+.featureCard {
+    width: 450px;
+    padding: 40px;
+    border: var(--el-border);
+    font-size: var(--el-font-size-large);
+    margin-left: 20px;
+    margin-right: 20px
+}
+@media screen and (max-width: 1000px) {
+    .featureCard {
+        margin-left: 0;
+        margin-right: 0;
+        max-width: 100%;
+        padding: 30px;
+    }
+}
+
+.featureHeading {
+    font-size: var(--el-font-size-extra-large);
+    padding-bottom: 20px;
+}
+
+.start {
+    text-align: center;
+}
 </style>
 <i18n>
 {
     "ru": {
-        "slogan": "– узнай всё!",
         "mission": "Наша миссия – сделать образование доступным для каждого",
         "start": "Начать",
         "create": "Создать",
@@ -264,7 +351,6 @@ export default defineComponent({
         "aims": "Наши цели"
     },
     "en": {
-        "slogan": "– learn everything!",
         "mission": "Our mission is to make education affordable\nfor every person",
         "start": "Start",
         "create": "Create",
