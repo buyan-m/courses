@@ -1,7 +1,6 @@
 <template>
     <router-link :to="targetLink">
         <el-card
-            :class="$style.card"
             shadow="never"
         >
             <div :class="$style.heading">
@@ -42,9 +41,6 @@ export default defineComponent({
 })
 </script>
 <style module>
-.card {
-    width: 300px;
-}
 .heading {
     font-size: var(--el-font-size-large)
 }

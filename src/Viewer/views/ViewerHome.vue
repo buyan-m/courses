@@ -64,9 +64,9 @@ export default defineComponent({
         }
     },
     created() {
-        request<TCourseStructure[]>('/api/viewer/courses/featured').then(({ data, errors }) => {
-            if (!errors.length) {
-                // this.featuredCourses = data!
+        request<TCourseStructure>('/api/viewer/courses/featured').then(({ data, errors }) => {
+            if (!errors.length && data) {
+                this.featuredCourses = [data]
                 this.pageStatus = PageStatus.ready
             } else {
                 this.pageStatus = PageStatus.error

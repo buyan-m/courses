@@ -32,7 +32,7 @@ const CONVERTERS = {
         } else {
             el = 'ul'
         }
-        return h(el, {}, data.items.map((text) => h('li', { innerHTML: text })))
+        return h(el, {}, data.items.map((text) => h('li', { innerHTML: text, class: $style.listItem })))
     },
     note(data: { text: string }) {
         return h(NoteBlock, { text: data.text })
@@ -72,10 +72,6 @@ function answerHandler(blockNumber: number) {
 
 function convert(structure: TPage['structure']) {
     return structure.blocks.map((block, index) => {
-        if (!CONVERTERS[block.type]) {
-            console.log(block.type, block.data)
-            return h('span', 'OOPS!')
-        }
         if (TYPES_REQUIRE_ANSWER.indexOf(block.type) !== -1) {
             return CONVERTERS[block.type](block.data, answerHandler(index))
         }
@@ -99,9 +95,18 @@ watch(() => questions.value, (newValue) => {
 const page = () => h('article', convertedBlocks.value)
 </script>
 <template>
-    <page />
+    <page :class="$style.lesson" />
 </template>
 <style module>
+.lesson {
+    font-size: 18px;
+    line-height: 1.7;
+    padding-bottom: 20px;
+}
+
+.listItem {
+    margin-bottom: 10px;
+}
 .youtubeEmbed {
     width: 800px;
     height: 450px;

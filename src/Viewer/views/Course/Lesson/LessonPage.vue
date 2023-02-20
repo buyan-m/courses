@@ -1,5 +1,8 @@
 <template>
     <SingleColumnLayout v-loading="pageStatus === 'loading'">
+        <h1>
+            {{ heading }}
+        </h1>
         <LessonPageContent
             :content="pageContent"
             @answersReceived="answersReceived"
@@ -32,6 +35,7 @@ export default defineComponent({
     components: { LessonPageContent, SingleColumnLayout },
     data() {
         return {
+            heading: '',
             pageContent: [] as unknown as TViewerPage['structure'],
             pageCompleted: false,
             nextPage: false,
@@ -87,6 +91,7 @@ export default defineComponent({
             request<TViewerPage>(`/api/viewer/pages/${pageId}`).then(({ data }) => {
                 if (data) {
                     this.pageContent = data!.structure
+                    this.heading = data!.name
                     this.nextPage = data!.nextPageAvailable
                     this.pageCompleted = false
                     this.pageStatus = PageStatus.ready
