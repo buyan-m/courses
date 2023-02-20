@@ -108,7 +108,13 @@ const page = () => h('article', convertedBlocks.value)
     margin-bottom: 10px;
 }
 .youtubeEmbed {
-    width: 800px;
-    height: 450px;
+    width: 100%;
+    height: 500px;
+}
+@media screen and (max-width: 1000px) {
+    .youtubeEmbed {
+        width: 100%;
+        height: calc(56.25vw - 60px);
+    }
 }
 </style>
