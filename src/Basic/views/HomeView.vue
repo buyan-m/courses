@@ -90,13 +90,12 @@
     </section>
     <section :class="$style.featureWrapper">
         <p :class="$style.start">
-            Let's look what we have
-            <br>
+            {{ $t('let\'s start') }}
             <router-link :to="{name: 'viewer-home'}">
-                Created courses
-            </router-link> or
+                {{ $t('our courses') }}
+            </router-link> {{ $t('or') }}
             <router-link :to="{name: 'editor-home'}">
-                Create your own
+                {{ $t('create your own') }}
             </router-link>
         </p>
     </section>
@@ -348,22 +347,30 @@ export default defineComponent({
         "a11y":  "Доступность",
         "a11y-descr": "Для работы на платформе потребуется лишь доступ в интернет и устройство с относительно современным браузером.",
         "what's-it": "Okul (“школа” на турецком). Проект служит одной цели - сделать образование доступным. Образование открывает двери к реализации любых человеческих фантазий. Жажда к знаниям является одним из важнейших столпов человечества. Мы верим, что через просвещение человечество может победить любые проблемы, поэтому критически важно обеспечить людей качественным образованием. Проект не сможет существовать без энтузиастов, заводящих сюда курсы и рассказывающих о них своим ученикам.",
-        "aims": "Наши цели"
+        "aims": "Наши цели",
+        "let's start": "Давайте посмотрим на",
+        "our courses": "готовые курсы",
+        "or": "или",
+        "create your own": "создадим новый"
     },
     "en": {
-        "mission": "Our mission is to make education affordable\nfor every person",
+        "mission": "Our mission is to make education accessible\nfor every person",
         "start": "Start",
         "create": "Create",
-        "to-teachers": "We offer an opportunity to create unique, relevant courses, test educational hypotheses without waiting for new schoolbooks to get printed",
+        "to-teachers": "We offer an opportunity to create unique, relevant courses and test educational hypotheses without waiting for new textbooks to get printed",
         "try": "Why you should try ",
         "free":  "Free to use",
         "free-descr": "Course creation and learning are totally free. Everything you need is to register.",
-        "community":  "Driven by the people to the people",
-        "community-descr": "Everyone can create their own courses and teach students with them. Only one restriction: the course should not violate local law and platform policies.",
+        "community":  "Brought to you by the people",
+        "community-descr": "Everyone can create their own courses and use them to teach students. Only one restriction: the course should not violate local law and platform policies.",
         "a11y":  "Accessibility",
-        "a11y-descr": "Everything you need  - access to the internet and device with a modern enough browser.",
-        "what's-it": "Okul (“school” in Turkish). The project’s ultimate goal - make education affordable. Knowledge opens doors to implement any human’s dreams. Thirst for knowledge is one of the most crucial pillars of humanity. We believe that through enlightenment humans can beat any issue, that’s why it is critical to provide people with quality education. The project would not exist without enthusiasts, who create courses here and share them with students.",
-        "aims": "Our aims"
+        "a11y-descr": "Everything you need - access to the internet and device with a modern enough browser.",
+        "what's-it": "Okul (“school” in Turkish). The project’s ultimate goal - make education accessible. Knowledge opens doors to fulfill any human’s dreams. Thirst for knowledge is one of the most crucial pillars of humanity. We believe that through knowledge people can overcome any issue, that’s why it is important to provide a quality education. This project would not exist without enthusiasts, who create courses and share them with students.",
+        "aims": "Our aims",
+        "let's start": "Let's check out",
+        "our courses": "our courses",
+        "or": "or",
+        "create your own": "create your own"
     }
 }
 </i18n>
