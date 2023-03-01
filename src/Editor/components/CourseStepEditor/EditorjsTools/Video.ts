@@ -1,14 +1,17 @@
 import './styles.css'
-import type { BaseTool } from '@editorjs/editorjs'
+import type { API, BaseTool } from '@editorjs/editorjs'
 import type { TEditorBlockVideo } from '@/types/api/page-content'
 import { createYoutubeURL } from '@/utils/embeds'
 
 type TVideoConstructorParams = {
-    data: TEditorBlockVideo['data']
+    data: TEditorBlockVideo['data'],
+    api: API
 }
 
 export default class Video implements BaseTool {
     private readonly data: TEditorBlockVideo['data']
+
+    private readonly api: API
 
     /**
      * @param {object} tool - tool properties got from editor.js
@@ -18,9 +21,11 @@ export default class Video implements BaseTool {
      * @param {boolean} tool.readOnly - read-only mode flag
      */
     constructor({
-        data
+        data,
+        api
     }: TVideoConstructorParams) {
         this.data = data
+        this.api = api
     }
 
     render() {
@@ -28,7 +33,10 @@ export default class Video implements BaseTool {
             const url = new URL(window.prompt('youtube url')!)
             this.data.videoId = url.searchParams.get('v')!
         }
-
+        if (!this.data.videoId) {
+            this.api.blocks.delete(this.api.blocks.getCurrentBlockIndex())
+            throw new Error('Can\'t add block without videoId')
+        }
         const iframe = document.createElement('iframe')
         iframe.src = createYoutubeURL(this.data.videoId)
         return iframe

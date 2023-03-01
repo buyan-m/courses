@@ -23,5 +23,10 @@ export function createSoundcloudEmbed(url: string) {
             headers: { 'Content-Type': 'text/plain' },
             credentials: 'omit'
         }
-    ).then((resp) => resp.data!.html)
+    ).then(({ data, errors }) => {
+        if (!errors.length) {
+            return data!.html
+        }
+        return Promise.reject(new Error('Something went wrong'))
+    })
 }
