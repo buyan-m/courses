@@ -68,4 +68,12 @@ export type TEditorBlockUnknown = {
 }
 
 export type TEditorBlock = TEditorBlockParagraph | TEditorBlockHeading | TEditorBlockImage |
-    TEditorBlockAudio | TEditorBlockVideo | TEditorBlockRadio | TEditorBlockCheckbox | TEditorBlockUnknown
+TEditorBlockAudio | TEditorBlockVideo | TEditorBlockRadio | TEditorBlockCheckbox | TEditorBlockUnknown
+
+// export type TAnswer = {
+//     id: string,
+//     answer: {
+//         type: string,
+//         value: unknown
+//     }
+// }

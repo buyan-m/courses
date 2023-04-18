@@ -16,6 +16,7 @@ export enum EditorBlockType {
 }
 
 export type TEditorBlock = {
+    id: string,
     type: EditorBlockType,
     data: Record<string, unknown> // доуточнить
 }

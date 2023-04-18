@@ -1,117 +1,106 @@
 <template>
     <SingleColumnLayout v-loading="pageStatus === 'loading'">
         <h1>
-            {{ heading }}
+            {{ $store.heading }}
         </h1>
         <LessonPageContent
-            :content="pageContent"
+            :content="$store.pageContent"
+            :saved-answers="$store.savedAnswers"
             @answersReceived="answersReceived"
         />
         <el-button
-            v-if="nextPage"
-            :disabled="!pageCompleted"
+            v-if="$store.nextPage"
+            :disabled="!$store.pageCompleted"
             @click="goToNextPage"
         >
             next
         </el-button>
         <el-button
-            v-if="!nextPage"
-            :disabled="!pageCompleted"
+            v-if="!$store.nextPage"
+            :disabled="!$store.pageCompleted"
             @click="completeLesson"
         >
             done
         </el-button>
     </SingleColumnLayout>
 </template>
-<script lang="ts">
-import { defineComponent } from 'vue'
+<script lang="ts" setup>
+import { ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import SingleColumnLayout from '@/layouts/columns/SingleColumnLayout.vue'
 import LessonPageContent from '@/Viewer/components/LessonPageContent/LessonPageContent.vue'
-import request from '@/utils/request'
-import type { TViewerPage, TNextPage } from '@/types/api/viewer-responses'
 import { PageStatus } from '@/constants/PageStatus'
+import { TTestAnswer } from '@/types/api/learning-responses'
+import { useLessonPageStore } from './LessonPage.store'
 
-export default defineComponent({
-    components: { LessonPageContent, SingleColumnLayout },
-    data() {
-        return {
-            heading: '',
-            pageContent: [] as unknown as TViewerPage['structure'],
-            pageCompleted: false,
-            nextPage: false,
-            pageStatus: PageStatus.loading
-        }
-    },
-    computed: {
-        pageId():string {
-            return this.$route.params.pageId as unknown as string
-        }
-    },
-    watch: {
-        pageId(value) {
-            if (value) {
-                this.updateContent()
-            } else {
-                // history back triggered
-            }
-        }
-    },
-    created() {
-        this.updateContent()
-    },
-    methods: {
-        answersReceived() {
-            this.pageCompleted = true
-        },
-        goToNextPage() {
-            const { pageId } = this.$route.params
-            this.pageStatus = PageStatus.loading
-            request<TNextPage>(`/api/viewer/pages/${pageId}/next`, {
-                method: 'post',
-                body: JSON.stringify({ answers: [] })
-            }).then(({ data }) => {
-                if (data) {
-                    this.$router.push({
-                        name: 'viewer-lesson-page',
-                        params: {
-                            pageId: data.pageId,
-                            lessonId: this.$route.params.lessonId,
-                            courseId: this.$route.params.courseId
-                        }
-                    })
-                } else {
-                    this.pageStatus = PageStatus.error
+const $store = useLessonPageStore()
+const $route = useRoute()
+const $router = useRouter()
+
+const pageStatus = ref<PageStatus>(PageStatus.loading)
+
+const { pageId } = $route.params
+
+function updateContent() {
+    pageStatus.value = PageStatus.loading
+
+    return $store.getLessonPage(pageId as string).then(() => {
+        pageStatus.value = PageStatus.ready
+    }, () => {
+        pageStatus.value = PageStatus.error
+    })
+}
+
+function answersReceived(answers: TTestAnswer[]) {
+    $store.setAnswers(answers)
+}
+
+function goToNextPage() {
+    pageStatus.value = PageStatus.loading
+
+    $store.getNextPage().then((nextPageId) => {
+        if (nextPageId) {
+            $router.push({
+                name: 'viewer-lesson-page',
+                params: {
+                    pageId: nextPageId,
+                    lessonId: $route.params.lessonId,
+                    courseId: $route.params.courseId
                 }
             })
-        },
-        updateContent() {
-            this.pageContent = { blocks: [] }
-            const { pageId } = this.$route.params
-            this.pageStatus = PageStatus.loading
-            request<TViewerPage>(`/api/viewer/pages/${pageId}`).then(({ data }) => {
-                if (data) {
-                    this.pageContent = data!.structure
-                    this.heading = data!.name
-                    this.nextPage = data!.nextPageAvailable
-                    this.pageCompleted = false
-                    this.pageStatus = PageStatus.ready
-                } else {
-                    this.pageStatus = PageStatus.error
+        } else {
+            pageStatus.value = PageStatus.error
+        }
+    }).catch((error) => {
+        // show error notification
+        pageStatus.value = PageStatus.error
+    })
+}
+
+function completeLesson() {
+    pageStatus.value = PageStatus.loading
+
+    $store.completeLesson($route.params.lessonId as string)
+        .then(() => {
+            $router.push({
+                name: 'viewer-course',
+                params: {
+                    courseId: $route.params.courseId
                 }
             })
-        },
-        completeLesson() {
-            this.pageStatus = PageStatus.loading
-            request<TViewerPage>(`/api/viewer/lessons/${this.$route.params.lessonId}/complete`, { method: 'post' })
-                .then(() => {
-                    this.$router.push({
-                        name: 'viewer-course',
-                        params: {
-                            courseId: this.$route.params.courseId
-                        }
-                    })
-                })
-        }
+        }).catch((error) => {
+            // show error notification
+            pageStatus.value = PageStatus.error
+        })
+}
+
+watch(() => pageId, (value) => {
+    if (value) {
+        updateContent()
+    } else {
+        // history back triggered
     }
 })
+
+updateContent()
 </script>
