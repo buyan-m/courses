@@ -32,6 +32,7 @@ export type TLessonCreateResponse = {
 export type TPage = {
     _id: TPageId,
     name: string,
+    isAnswersVisible: boolean,
     structure: {
         blocks: TEditorBlock[]
     }

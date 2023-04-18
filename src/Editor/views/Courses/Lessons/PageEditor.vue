@@ -1,8 +1,16 @@
 <template>
     <SingleColumnLayout v-loading="pageStatus === 'loading' || pageStatus === 'updating'">
-        <router-link :to="{name: 'editor-course-update', params: {courseId: $route.params.courseId}}">
-            back to course
-        </router-link>
+        <div :class="$style.serviceHeader">
+            <router-link :to="{name: 'editor-course-update', params: {courseId: $route.params.courseId}}">
+                back to course
+            </router-link>
+            <span>
+                {{ $t('show-answers') }}
+                <el-switch
+                    v-model="page.isAnswersVisible"
+                />
+            </span>
+        </div>
         <HeadingEditable
             :text="page.name"
             @change="headingChangeHandler"
@@ -36,12 +44,13 @@ export default defineComponent({
             initialPageStructure: {
                 blocks: [
                     {
+                        id: 'd3f4ult',
                         type: 'paragraph',
                         data: { text: 'Hello! Let me introduce our editor' }
                     }
                 ]
             } as TPage['structure'],
-            page: { name: 'placeholder', updatedName: 'placeholder' },
+            page: { name: 'placeholder', updatedName: 'placeholder', isAnswersVisible: true },
             pageStatus: PageStatus.loading
         }
     },
@@ -52,11 +61,11 @@ export default defineComponent({
     },
     created() {
         if (this.$route.params.pageId) {
-            request<TPage>(`/api/editor/pages/${this.$route.params.pageId}`).then(({ data, errors }) => {
+            request<TPage>(`/api/editor/pages/${this.$route.params.pageId}`).then(({ data }) => {
                 if (data) {
                     this.initialPageStructure = data.structure
                     this.pageStatus = PageStatus.ready
-                    this.page = { name: data.name, updatedName: data.name }
+                    this.page = { name: data.name, updatedName: data.name, isAnswersVisible: data.isAnswersVisible }
                 } else {
                     this.pageStatus = PageStatus.error
                 }
@@ -79,6 +88,7 @@ export default defineComponent({
                     },
                     body: JSON.stringify({
                         name: this.page.updatedName,
+                        isAnswersVisible: this.page.isAnswersVisible,
                         structure: content,
                         lessonId
                     })
@@ -88,7 +98,10 @@ export default defineComponent({
 
                 if (!this.$route.params.pageId && data) {
                     const { courseId } = this.$route.params
-                    this.$router.push({ name: 'editor-lesson-update-page', params: { pageId: data.pageId, lessonId, courseId } })
+                    this.$router.push({
+                        name: 'editor-lesson-update-page',
+                        params: { pageId: data.pageId, lessonId, courseId }
+                    })
                 }
                 if (errors.length) {
                     this.pageStatus = PageStatus.error
@@ -106,7 +119,15 @@ export default defineComponent({
     {
         "en": {
             "Pages": "Pages",
-            "Save": "Save"
+            "Save": "Save",
+            "show-answers": "The correctness of the answers will be visible to a student"
         }
     }
 </i18n>
+<style module>
+.serviceHeader {
+    display: flex;
+    justify-content: space-between;
+}
+
+</style>

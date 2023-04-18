@@ -17,23 +17,47 @@
                 </el-radio>
             </el-form-item>
         </el-radio-group>
+        <OriginalAnswers
+            v-if="isOriginalValueVisible"
+            :original-answers="[originalValue]"
+        />
     </el-form>
 </template>
 <script lang="ts" setup>
 import {
-    defineProps, defineEmits, ref, useCssModule
+    defineProps, defineEmits, ref, useCssModule, watch
 } from 'vue'
-import type { TOption } from '@/types/api/exercises'
+import type { TOption } from '@/types/api/page-content'
+import type { TRadioAnswer } from '@/types/api/learning-responses'
+import OriginalAnswers from '@/Viewer/PageBlocks/OriginalAnswers/OriginalAnswers.vue'
 
 const $styles = useCssModule()
+const props = defineProps<{ options: TOption[], answer?: TRadioAnswer }>()
+const emit = defineEmits(['answer'])
+
 const answerChecked = ref(false)
 const checkedAnswerIndex = ref(-1)
-const props = defineProps<{ options: TOption[] }>()
-const emit = defineEmits(['answer'])
+const originalValue = ref('')
+const isOriginalValueVisible = ref(false)
+
+function alreadyAnsweredCallback(answer?: TRadioAnswer) {
+    if (answer) {
+        checkedAnswerIndex.value = props.options.findIndex(({ value }) => answer.value === value)
+        if (checkedAnswerIndex.value === -1) {
+            isOriginalValueVisible.value = true
+            originalValue.value = answer.value
+        }
+        answerChecked.value = true
+    }
+}
+
+watch(() => props.answer, (answer) => {
+    alreadyAnsweredCallback(answer)
+})
 
 function checkAnswer() {
     answerChecked.value = true
-    emit('answer')
+    emit('answer', props.options[checkedAnswerIndex.value].value)
 }
 
 function getOptionStyles(index: number) {
@@ -42,6 +66,8 @@ function getOptionStyles(index: number) {
     }
     return $styles.row
 }
+
+alreadyAnsweredCallback(props.answer)
 </script>
 <style module>
 .correctRow {
@@ -52,5 +78,8 @@ function getOptionStyles(index: number) {
 }
 .row {
     width: 100%;
+}
+.originalValue {
+
 }
 </style>

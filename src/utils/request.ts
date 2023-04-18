@@ -1,5 +1,5 @@
 const SERVER_ORIGIN = ''
-type TResponse<T> = {
+export type TResponse<T> = {
     data: T | null,
     errors: string[]
 }

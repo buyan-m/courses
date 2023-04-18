@@ -13,8 +13,9 @@ import SoundCloud from '@/Viewer/PageBlocks/SoundCloud/SoundCloud.vue'
 import ViewerImageWrapper from '@/Viewer/PageBlocks/ViewerImageWrapper/ViewerImageWrapper.vue'
 import type { TOption } from '@/types/api/page-content'
 import { createYoutubeURL } from '@/utils/embeds'
+import { TAnswer, TTestAnswer } from '@/types/api/learning-responses'
 
-type TConvertor = (data: unknown, handler?: () => void) => VNode
+type TConvertor = (data: unknown, handler?: (answer: unknown) => void, answer?: unknown) => VNode
 
 const $style = useCssModule()
 
@@ -46,49 +47,67 @@ const CONVERTERS = {
     video(data: { videoId: string }) {
         return h('iframe', { src: createYoutubeURL(data.videoId), class: $style.youtubeEmbed })
     },
-    radio(data: { options: TOption[] }, passHandler) {
-        return h(RadioExercise, { options: data.options, onAnswer: passHandler })
+    radio(data: { options: TOption[] }, passHandler, answer) {
+        return h(RadioExercise, { options: data.options, onAnswer: passHandler, answer })
     },
-    checkbox(data: { options: TOption[] }, passHandler) {
-        return h(CheckExercise, { options: data.options, onAnswer: passHandler })
+    checkbox(data: { options: TOption[] }, passHandler, answer) {
+        return h(CheckExercise, { options: data.options, onAnswer: passHandler, answer })
     },
-    input(data: { answers: string[] }, passHandler) {
-        return h(InputExercise, { answers: data.answers, onAnswer: passHandler })
+    input(data: { answers: string[] }, passHandler, answer) {
+        return h(InputExercise, { answers: data.answers, onAnswer: passHandler, answer })
     }
 } as Record<EditorBlockType, TConvertor>
 
 const TYPES_REQUIRE_ANSWER = ['radio', 'checkbox', 'input']
-const props = defineProps<{ content: TPage['structure'] }>()
+const props = defineProps<{ content: TPage['structure'], savedAnswers: Record<string, TAnswer> }>()
 const emit = defineEmits(['answersReceived'])
 const convertedBlocks = ref([] as VNode[])
-const questions = ref([] as number[])
+const questions = ref([] as string[])
+const answers = ref([] as TTestAnswer[])
 
-function answerHandler(blockNumber: number) {
-    questions.value.push(blockNumber)
-    return () => {
-        questions.value = questions.value.filter((el) => el !== blockNumber)
+function answerHandler(blockId: string, blockType: string) {
+    questions.value.push(blockId)
+    return (answer: unknown) => {
+        questions.value = questions.value.filter((el) => el !== blockId)
+        answers.value.push({
+            id: blockId,
+            answer: {
+                type: blockType,
+                value: answer
+            } as TAnswer
+        })
     }
 }
 
 function convert(structure: TPage['structure']) {
-    return structure.blocks.map((block, index) => {
+    return structure.blocks.map((block) => {
         if (TYPES_REQUIRE_ANSWER.indexOf(block.type) !== -1) {
-            return CONVERTERS[block.type](block.data, answerHandler(index))
+            const answer = props.savedAnswers[block.id]
+            return CONVERTERS[block.type](block.data, answerHandler(block.id, block.type), answer)
         }
         return CONVERTERS[block.type](block.data)
     })
 }
 
 watch(() => props.content, (newValue) => {
+    answers.value = []
     convertedBlocks.value = convert(newValue)
     if (questions.value.length === 0) {
-        emit('answersReceived')
+        emit('answersReceived', [])
+    }
+})
+
+watch(() => props.savedAnswers, () => {
+    answers.value = []
+    convertedBlocks.value = convert(props.content)
+    if (questions.value.length === 0) {
+        emit('answersReceived', [])
     }
 })
 
 watch(() => questions.value, (newValue) => {
     if (newValue.length === 0) {
-        emit('answersReceived')
+        emit('answersReceived', answers.value)
     }
 })
 

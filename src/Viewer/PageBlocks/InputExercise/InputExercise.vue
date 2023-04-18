@@ -23,10 +23,11 @@
     </el-form>
 </template>
 <script lang="ts" setup>
-import { defineProps, ref } from 'vue'
+import { defineProps, ref, watch } from 'vue'
 import { FormInstance } from 'element-plus'
+import { TTextAnswer } from '@/types/api/learning-responses'
 
-const props = defineProps<{ answers: string[] }>()
+const props = defineProps<{ answers: string[], answer?: TTextAnswer }>()
 const emit = defineEmits(['answer'])
 const answer = ref({ text: '' })
 const inputClass = ref('')
@@ -39,11 +40,20 @@ function checkAnswer(value: string) {
     }
     return false
 }
+
+function alreadyAnsweredCallback(alreadyAnsweredValue?: TTextAnswer) {
+    if (alreadyAnsweredValue) {
+        answer.value.text = alreadyAnsweredValue.value
+        inputDisabled.value = true
+    }
+}
+
 function submit() {
+    // обдумать как сделать вариант без проверки для отправки сразу
     const formInstance = form.value! as FormInstance
     formInstance.validate((valid) => {
         if (valid) {
-            emit('answer')
+            emit('answer', answer.value.text)
             inputDisabled.value = true
         }
     })
@@ -57,4 +67,8 @@ const answerRules = ref({
     }]
 })
 
+watch(() => props.answer, (alreadyAnsweredValue) => {
+    alreadyAnsweredCallback(alreadyAnsweredValue)
+})
+alreadyAnsweredCallback(props.answer)
 </script>
