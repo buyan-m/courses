@@ -7,7 +7,7 @@ export const useLessonPageStore = defineStore('lessonPage', {
     state: () => ({
         currentPageId: '',
         heading: '',
-        pageContent: [] as unknown as TViewerPage['structure'],
+        pageContent: { blocks: [] } as TViewerPage['structure'],
         nextPage: false,
         pageCompleted: false,
         answers: [] as TTestAnswer[],
