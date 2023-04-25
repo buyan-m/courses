@@ -1,8 +1,12 @@
 <template>
     <SingleColumnLayout v-loading="pageStatus === 'loading'">
-        <section :class="$style.courseSection">
+        <section
+            v-if="pageStatus === 'ready'"
+            :class="$style.courseSection"
+        >
             <HeadingEditable
                 :text="$store.course.name"
+                data-test="heading"
                 @change="headingUpdate"
             />
 
@@ -24,9 +28,15 @@
                 />
             </transition>
         </section>
-
+        <p
+            v-if="pageStatus === 'error'"
+            :class="$style.error"
+            data-test="errorText"
+        >
+            {{ errorText }}
+        </p>
         <CourseLessons
-            v-if="$store.courseStatus !== CourseStatus.new"
+            v-if="isLessonsVisible"
             :lessons="$store.course.lessons"
             :course-id="$store.courseId"
             @saveLesson="lessonChanged"
@@ -34,7 +44,7 @@
     </SingleColumnLayout>
 </template>
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { PageStatus } from '@/constants/PageStatus'
 import SingleColumnLayout from '@/layouts/columns/SingleColumnLayout.vue'
@@ -49,14 +59,25 @@ const $route = useRoute()
 const $router = useRouter()
 
 const pageStatus = ref(PageStatus.loading)
+const errorText = ref('')
+const isLessonsVisible = ref(false)
 
 const routeCourseId = ref($route.params.courseId as string)
 
 let changeCourseTimeout = 0
 
-$store.getCourse(routeCourseId.value).then(() => {
-    pageStatus.value = PageStatus.ready
-})
+function getCourse() {
+    pageStatus.value = PageStatus.loading
+    isLessonsVisible.value = false
+
+    $store.getCourse(routeCourseId.value).then(() => {
+        pageStatus.value = PageStatus.ready
+        isLessonsVisible.value = $store.courseStatus !== CourseStatus.new
+    }, (error) => {
+        pageStatus.value = PageStatus.error
+        errorText.value = error
+    })
+}
 
 function saveCourse() {
     if (changeCourseTimeout) {
@@ -86,6 +107,12 @@ function descriptionUpdate(description: string) {
     saveCourse()
 }
 
+watch(() => $route.params.courseId, (val) => {
+    routeCourseId.value = val as string
+    getCourse()
+})
+
+getCourse()
 </script>
 <style module>
 .courseSection {
@@ -107,6 +134,10 @@ function descriptionUpdate(description: string) {
 
 .opacityLeaveTo {
     opacity: 0;
+}
+.error {
+    color: var(--el-color-error);
+    font-size: var(--el-font-size-large)
 }
 </style>
 <i18n lang="json">

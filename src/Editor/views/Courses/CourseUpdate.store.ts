@@ -35,12 +35,16 @@ export const useCourseUpdateStore = defineStore('courseUpdate', {
             if (courseId) {
                 this.courseId = courseId
 
-                return request<TCourseStructure>(`/api/editor/courses/${this.courseId}`).then(({ data }) => {
-                    this.course = data!
-                    this.course.lessons.push(getEmptyLesson())
-                    this.courseUpdatedName = data!.name
-                    this.courseUpdatedDescription = data!.description
-                    this.courseStatus = CourseStatus.created
+                return request<TCourseStructure>(`/api/editor/courses/${this.courseId}`).then(({ data, errors }) => {
+                    if (data) {
+                        this.course = data
+                        this.course.lessons.push(getEmptyLesson())
+                        this.courseUpdatedName = data.name
+                        this.courseUpdatedDescription = data.description
+                        this.courseStatus = CourseStatus.created
+                    } else if (errors.length) {
+                        return Promise.reject(errors[0])
+                    }
                 })
             }
             return Promise.resolve()
