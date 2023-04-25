@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "build": "vue-cli-service build",
-    "test:pre": "ts-node --project ./e2e/tsconfig.e2e.json ./e2e/pre-run.ts",
+    "test:pre": "ts-node --project ./e2e/tsconfig.json ./e2e/pre-run.ts",
     "test:e2e": "npm run test:pre && playwright test",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
     "dev": "vue-cli-service serve",

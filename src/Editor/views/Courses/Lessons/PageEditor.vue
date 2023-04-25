@@ -1,26 +1,36 @@
 <template>
     <SingleColumnLayout v-loading="pageStatus === 'loading' || pageStatus === 'updating'">
-        <div :class="$style.serviceHeader">
-            <router-link :to="{name: 'editor-course-update', params: {courseId: $route.params.courseId}}">
-                back to course
-            </router-link>
-            <span>
-                {{ $t('show-answers') }}
-                <el-switch
-                    v-model="page.isAnswersVisible"
-                />
-            </span>
-        </div>
-        <HeadingEditable
-            :text="page.name"
-            @change="headingChangeHandler"
-        />
-        <CourseStepEditor
-            v-if="shouldWeShowEditor"
-            ref="editor"
-            :initial-page="initialPageStructure"
-            @save="editorReturnDataHandler"
-        />
+        <template v-if="shouldWeShowEditor">
+            <div :class="$style.serviceHeader">
+                <router-link :to="{name: 'editor-course-update', params: {courseId: $route.params.courseId}}">
+                    back to course
+                </router-link>
+                <span>
+                    {{ $t('show-answers') }}
+                    <el-switch
+                        v-model="page.isAnswersVisible"
+                    />
+                </span>
+            </div>
+            <HeadingEditable
+                :text="page.name"
+                data-test="heading"
+                @change="headingChangeHandler"
+            />
+            <CourseStepEditor
+                v-if="shouldWeShowEditor"
+                ref="editor"
+                :initial-page="initialPageStructure"
+                @save="editorReturnDataHandler"
+            />
+        </template>
+        <p
+            v-if="pageStatus === 'error'"
+            :class="$style.error"
+            data-test="errorText"
+        >
+            {{ errorText }}
+        </p>
     </SingleColumnLayout>
 </template>
 <script lang="ts">
@@ -51,23 +61,26 @@ export default defineComponent({
                 ]
             } as TPage['structure'],
             page: { name: 'placeholder', updatedName: 'placeholder', isAnswersVisible: true },
-            pageStatus: PageStatus.loading
+            pageStatus: PageStatus.loading as PageStatus,
+            errorText: ''
         }
     },
     computed: {
         shouldWeShowEditor() {
-            return this.pageStatus !== PageStatus.loading
+            return this.pageStatus === PageStatus.ready
         }
     },
     created() {
         if (this.$route.params.pageId) {
-            request<TPage>(`/api/editor/pages/${this.$route.params.pageId}`).then(({ data }) => {
+            request<TPage>(`/api/editor/pages/${this.$route.params.pageId}`).then(({ data, errors }) => {
                 if (data) {
                     this.initialPageStructure = data.structure
                     this.pageStatus = PageStatus.ready
                     this.page = { name: data.name, updatedName: data.name, isAnswersVisible: data.isAnswersVisible }
                 } else {
                     this.pageStatus = PageStatus.error
+                    // eslint-disable-next-line prefer-destructuring
+                    this.errorText = errors[0]
                 }
             })
         } else {
@@ -128,6 +141,10 @@ export default defineComponent({
 .serviceHeader {
     display: flex;
     justify-content: space-between;
+}
+.error {
+    color: var(--el-color-error);
+    font-size: var(--el-font-size-large)
 }
 
 </style>

@@ -5,6 +5,7 @@
             :key="index"
             :class="$style.lesson"
             shadow="never"
+            :data-test-id="`lessonCard.${lesson._id}`"
             data-test="lessonCard"
         >
             <el-input
@@ -13,6 +14,7 @@
                 placeholder="Create new lesson"
                 autosize
                 resize="none"
+                data-test="lessonCard.name"
                 @input="lessonChanged(lesson)"
             />
             <div
@@ -23,6 +25,8 @@
                     v-for="(page, index) in lesson.pages"
                     :key="page._id + index"
                     :class="$style.page"
+                    data-test="lessonPage"
+                    :data-test-id="`lessonPage.${page._id}`"
                 >
                     <router-link
                         :to="{name: 'editor-lesson-update-page', params: {pageId: page._id, lessonId: lesson._id}}"

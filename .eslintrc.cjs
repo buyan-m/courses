@@ -55,11 +55,11 @@ module.exports = {
     }, {
         files: ['e2e/**/*.ts', 'e2e/*.ts'],
         parserOptions: {
-            project: ['./e2e/tsconfig.e2e.json'],
+            project: ['./e2e/tsconfig.json'],
             settings: {
                 'import/resolver': {
                     typescript: {
-                        project: './e2e/tsconfig.e2e.json',
+                        project: './e2e/tsconfig.json',
                     },
                 },
             },

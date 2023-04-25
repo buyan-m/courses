@@ -22,7 +22,7 @@ export default function request<T>(path: string, params?: RequestInit) {
             }
             return {
                 data: null,
-                errors: body.message
+                errors: [body.message]
             }
         } catch (error) {
             const message = (error as Error).toString()
