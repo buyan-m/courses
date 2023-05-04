@@ -3,6 +3,7 @@ import { AuthPage } from '../pages/auth.page'
 import routes from '../constants/routes'
 import credentials from '../constants/auth-credentials'
 import { fieldErrorClass } from '../constants/elements'
+import { logout } from '../utils/login'
 
 test.describe('Auth', () => {
     test('Home page opened', async ({ page }) => {
@@ -83,7 +84,7 @@ test.describe('Auth', () => {
         })
         test.afterAll(async ({ page, context }) => {
             await page.goto(routes.coursesPage)
-            await context.clearCookies()
+            await logout()
             await page.reload()
             await expect(page).toHaveURL(routes.authPageWithRedirect)
         })

@@ -3,8 +3,10 @@
         <div
             :id="editorId"
             ref="editor"
+            data-test="editor"
         />
         <el-button
+            data-test="editor-save"
             @click="returnValue"
         >
             {{ $t('Save') }}

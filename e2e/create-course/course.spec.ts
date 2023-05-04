@@ -3,6 +3,7 @@ import { EditorPage } from '../pages/editor.page'
 import routes from '../constants/routes'
 import data from '../data.json'
 import { EditorCoursePage } from '../pages/editorCourse.page'
+import { authorize, logout } from '../utils/login'
 
 const preparedPageLink = routes.editorLessonPage({
     courseId: data.testCourse.id,
@@ -13,15 +14,15 @@ const preparedPageLink = routes.editorLessonPage({
 test.describe('Create course', () => {
     test.describe('Unauthorized', () => {
         test('Editor home is unavailable for unauthorized users', async ({ page, context }) => {
-            await context.clearCookies()
+            await logout(context)
             await page.goto(routes.editorPage)
             await expect(page).toHaveURL(routes.authPageWithRedirect)
         })
     })
 
     test.describe('Authorized', () => {
-        test.beforeEach(({ page, context }) => {
-            context.addCookies([{ name: 'token', value: data.authToken, url: 'https://localhost:7080/' }])
+        test.beforeEach(async ({ context }) => {
+            await authorize(context)
         })
         test('Editor home is available for authorized users', async ({ page }) => {
             await page.goto(routes.editorPage)

@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test'
 import routes from '../constants/routes'
 import data from '../data.json'
 import { EditorLessonPage } from '../pages/editorLesson.page'
+import { logout } from '../utils/login'
 
 const preparedPageLink = routes.editorLessonPage({
     courseId: data.testCourse.id,
@@ -11,6 +12,11 @@ const preparedPageLink = routes.editorLessonPage({
 
 test.describe('Create page', () => {
     test.describe('Unauthorized', () => {
+        test('Editor page is unavailable for unauthorized users', async ({ page, context }) => {
+            await logout(context)
+            await page.goto(preparedPageLink)
+            await expect(page).toHaveURL(routes.authPageWithRedirect)
+        })
     })
     test.describe('Authorized', () => {
         test('User can\'t edit someone\'s else page', async ({ page }) => {

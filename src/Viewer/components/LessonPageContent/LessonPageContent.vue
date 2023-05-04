@@ -111,7 +111,7 @@ watch(() => questions.value, (newValue) => {
     }
 })
 
-const page = () => h('article', convertedBlocks.value)
+const page = () => h('article', { 'data-test': 'pageContent' }, convertedBlocks.value)
 </script>
 <template>
     <page :class="$style.lesson" />
