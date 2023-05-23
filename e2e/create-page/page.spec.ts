@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test'
 import routes from '../constants/routes'
 import data from '../data.json'
 import { EditorLessonPage } from '../pages/editorLesson.page'
-import { logout } from '../utils/login'
+import { authorize, logout } from '../utils/login'
 
 const preparedPageLink = routes.editorLessonPage({
     courseId: data.testCourse.id,
@@ -19,6 +19,10 @@ test.describe('Create page', () => {
         })
     })
     test.describe('Authorized', () => {
+        test.beforeEach(async ({ context }) => {
+            await authorize(context)
+        })
+
         test('User can\'t edit someone\'s else page', async ({ page }) => {
             const forbiddenPage = routes.editorLessonPage({
                 courseId: data.otherCourse.id,

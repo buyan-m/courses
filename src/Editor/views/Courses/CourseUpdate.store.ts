@@ -1,17 +1,23 @@
 import { defineStore } from 'pinia'
 import type {
-    TCourseCreateResponse, TCourseStructure, TLesson, TLessonCreateResponse
-} from '@/types/api/editor-responses'
-import type { TCourseId, TLessonId } from '@/types/api/common'
+    CourseCreateResponse,
+    CourseResponse,
+    TCourseId,
+    LessonResponse,
+    TLessonId,
+    EditorLessonCreateResponse,
+    Lesson,
+    LessonUpdateDTO
+} from '@/types/api-types'
 import { CourseStatus } from '@/constants/CourseStatus'
 import request from '@/utils/request'
-import { TLessonCreateDTO, TPage } from '@/types/api/editor-responses'
 
-function getEmptyLesson(): TLesson {
+function getEmptyLesson(): LessonResponse {
     return {
         _id: '',
         name: '',
-        pages: [] as TPage[]
+        courseId: '',
+        pages: []
     }
 }
 
@@ -27,7 +33,7 @@ export const useCourseUpdateStore = defineStore('courseUpdate', {
             name: 'Course\'s title',
             description: 'Course\'s description',
             lessons: [getEmptyLesson()]
-        } as TCourseStructure
+        } as CourseResponse
     }),
 
     actions: {
@@ -35,17 +41,21 @@ export const useCourseUpdateStore = defineStore('courseUpdate', {
             if (courseId) {
                 this.courseId = courseId
 
-                return request<TCourseStructure>(`/api/editor/courses/${this.courseId}`).then(({ data, errors }) => {
-                    if (data) {
-                        this.course = data
-                        this.course.lessons.push(getEmptyLesson())
-                        this.courseUpdatedName = data.name
-                        this.courseUpdatedDescription = data.description
-                        this.courseStatus = CourseStatus.created
-                    } else if (errors.length) {
-                        return Promise.reject(errors[0])
-                    }
-                })
+                return request<CourseResponse>(`/api/editor/courses/${this.courseId}`)
+                    .then(({ data, errors }) => {
+                        if (data) {
+                            this.course = data
+                            this.course.lessons.push(getEmptyLesson())
+                            this.courseUpdatedName = data.name
+                            this.courseUpdatedDescription = data.description
+                            this.courseStatus = CourseStatus.created
+                            return Promise.resolve()
+                        }
+                        if (errors.length) {
+                            return Promise.reject(errors[0])
+                        }
+                        return Promise.reject()
+                    })
             }
             return Promise.resolve()
         },
@@ -58,7 +68,7 @@ export const useCourseUpdateStore = defineStore('courseUpdate', {
             this.courseUpdatedDescription = description
         },
 
-        async saveLesson(lesson: TLesson): Promise<void | undefined> {
+        async saveLesson(lesson: LessonUpdateDTO): Promise<void | undefined> {
             if (this.courseStatus === CourseStatus.new || this.courseStatus === CourseStatus.requesting) {
                 return this.saveCourse().then(() => this.saveLesson(lesson))
             }
@@ -72,13 +82,13 @@ export const useCourseUpdateStore = defineStore('courseUpdate', {
             const lessonDTO = {
                 name: lesson.name,
                 courseId: this.courseId
-            } as TLessonCreateDTO
+            } as Lesson & { _id?: TLessonId }
 
             if (lesson._id) {
                 lessonDTO._id = lesson._id
             }
 
-            this.savingLessons[lessonId] = request<TLessonCreateResponse>(
+            this.savingLessons[lessonId] = request<EditorLessonCreateResponse>(
                 `/api/editor/lessons/${lessonId}`,
                 {
                     method: 'POST',
@@ -91,7 +101,7 @@ export const useCourseUpdateStore = defineStore('courseUpdate', {
                 this.savingLessons[lessonId] = undefined
 
                 if (data && lesson._id === '') {
-                    const index = this.course.lessons.findIndex(({ _id }: TLesson) => _id === lesson._id)
+                    const index = this.course.lessons.findIndex(({ _id }) => _id === lesson._id)
                     this.course.lessons[index] = {
                         ...lessonDTO,
                         _id: data.lessonId as TLessonId,
@@ -117,7 +127,7 @@ export const useCourseUpdateStore = defineStore('courseUpdate', {
 
             this.courseStatus = CourseStatus.requesting
 
-            this.courseUpdatePromise = request<TCourseCreateResponse>(`/api/editor/courses/${routeId}`, {
+            this.courseUpdatePromise = request<CourseCreateResponse>(`/api/editor/courses/${routeId}`, {
                 method: 'post',
                 headers: {
                     'content-type': 'application/json'

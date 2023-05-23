@@ -1,7 +1,7 @@
 import { createApp } from 'vue'
 import type { ComponentPublicInstance } from 'vue'
 import type { BaseTool } from '@editorjs/editorjs'
-import type { TOption } from '@/types/api/page-content'
+import type { Option } from '@/types/api-types'
 import i18n from '@/i18n'
 import elementPlus from 'element-plus'
 import RadioExerciseVue from './RadioExercise.vue'
@@ -9,14 +9,14 @@ import RadioExerciseVue from './RadioExercise.vue'
 type TRadioComponent = ComponentPublicInstance<{}, {}, { innerOptions: [] }>
 type TRadioConstructorParams = {
     data: {
-        options: TOption[]
+        options: Option[]
     }
 }
 
 export default class RadioExerciseTool implements BaseTool {
     private form: null | HTMLElement
 
-    private options: TOption[]
+    private options: Option[]
 
     private vueComponent: TRadioComponent | null
 

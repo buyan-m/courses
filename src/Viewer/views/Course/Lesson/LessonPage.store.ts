@@ -1,28 +1,56 @@
 import { defineStore } from 'pinia'
-import request from '@/utils/request'
-import { TNextPage, TViewerPage } from '@/types/api/viewer-responses'
-import { TAnswer, TLearningPageAnswers, TTestAnswer } from '@/types/api/learning-responses'
+import request, { TResponse } from '@/utils/request'
+import type {
+    NextPage, PageViewerDTO as ViewerPageResponse, AnswersDTO, AnswerFeedback, AnswerWithId, TAnswer
+} from '@/types/api-types'
 
 export const useLessonPageStore = defineStore('lessonPage', {
     state: () => ({
         currentPageId: '',
+        currentStudentId: '',
         heading: '',
-        pageContent: { blocks: [] } as TViewerPage['structure'],
+        pageContent: { blocks: [], version: '' } as ViewerPageResponse['structure'],
         nextPage: false,
         pageCompleted: false,
-        answers: [] as TTestAnswer[],
+        answers: [] as AnswerWithId[],
         saveRequest: Promise.resolve() as Promise<unknown>,
-        savedAnswers: {} as Record<string, TAnswer>
+        savedAnswers: {} as Record<string, TAnswer>,
+        updatedFeedbacks: {} as Record<string, AnswerFeedback>,
+        isUserTeacher: false
     }),
     actions: {
-        getLessonPage(pageId: string) {
+        getLessonPage(pageId: string, studentId?: string) {
             this.currentPageId = pageId
+            this.currentStudentId = ''
             this.pageCompleted = false
+            this.isUserTeacher = false
             this.savedAnswers = {} as Record<string, TAnswer>
             this.answers = []
+            let answersRequest: Promise<TResponse<AnswersDTO>> = new Promise(() => {})
+
+            if (studentId) {
+                answersRequest = request<AnswersDTO>(`/api/learning/answers/${pageId}/${studentId}`)
+                    .then((response) => {
+                        if (response.data) {
+                            this.isUserTeacher = true
+                            this.currentStudentId = studentId
+                            this.updatedFeedbacks = response.data.answers
+                                .reduce((acc, { id, answer }) => {
+                                    acc[id] = {
+                                        correctness: answer.correctness,
+                                        feedback: answer.feedback
+                                    }
+                                    return acc
+                                }, {} as Record<string, AnswerFeedback>)
+                        }
+                        return response
+                    })
+            } else {
+                answersRequest = request<AnswersDTO>(`/api/learning/answers/${pageId}`)
+            }
 
             return Promise.all([
-                request<TLearningPageAnswers>(`/api/learning/answers/${pageId}`).then(({ data }) => {
+                answersRequest.then(({ data, errors }) => {
                     if (data) {
                         this.savedAnswers = data.answers.reduce((acc, el) => {
                             acc[el.id] = el.answer
@@ -30,8 +58,11 @@ export const useLessonPageStore = defineStore('lessonPage', {
                         }, {} as Record<string, TAnswer>)
                         this.pageCompleted = true
                     }
+                    if (errors.length) {
+                        throw new Error(errors[0])
+                    }
                 }),
-                request<TViewerPage>(`/api/viewer/pages/${pageId}`).then(({ data, errors }) => {
+                request<ViewerPageResponse>(`/api/viewer/pages/${pageId}`).then(({ data, errors }) => {
                     if (data) {
                         this.pageContent = data!.structure
                         this.heading = data!.name
@@ -56,12 +87,23 @@ export const useLessonPageStore = defineStore('lessonPage', {
             })
         },
 
+        updateFeedback({ id, answerFeedback }: { id: string, answerFeedback: AnswerFeedback }) {
+            this.updatedFeedbacks[id] = answerFeedback
+        },
+
+        sendFeedbackToStudent() {
+            return request(`/api/learning/answers-feedback/${this.currentPageId}/${this.currentStudentId}`, {
+                method: 'put',
+                body: JSON.stringify(this.updatedFeedbacks)
+            })
+        },
+
         getNextPage() {
             if (this.answers.length) {
                 this.saveRequest = this.saveAnswers()
             }
 
-            return request<TNextPage>(`/api/viewer/pages/${this.currentPageId}/next`, {
+            return request<NextPage>(`/api/viewer/pages/${this.currentPageId}/next`, {
                 method: 'post'
             }).then(async ({ data, errors }) => {
                 if (data) {
@@ -76,7 +118,7 @@ export const useLessonPageStore = defineStore('lessonPage', {
             if (this.answers.length) {
                 this.saveRequest = this.saveAnswers()
             }
-            return request<TViewerPage>(`/api/viewer/lessons/${lessonId}/complete`, { method: 'post' })
+            return request(`/api/viewer/lessons/${lessonId}/complete`, { method: 'post' })
                 .then(({ errors }) => {
                     if (errors.length) {
                         // показать бы ошибку и все равно перевести на другую страницу, по прошествию saveRequest
@@ -85,7 +127,7 @@ export const useLessonPageStore = defineStore('lessonPage', {
                 })
         },
 
-        setAnswers(answers: TTestAnswer[]) {
+        setAnswers(answers: AnswerWithId[]) {
             this.answers = answers
             this.pageCompleted = true
         }

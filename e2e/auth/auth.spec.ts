@@ -84,7 +84,7 @@ test.describe('Auth', () => {
         })
         test.afterAll(async ({ page, context }) => {
             await page.goto(routes.coursesPage)
-            await logout()
+            await logout(context)
             await page.reload()
             await expect(page).toHaveURL(routes.authPageWithRedirect)
         })

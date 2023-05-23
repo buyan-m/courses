@@ -32,17 +32,17 @@
 import { defineComponent } from 'vue'
 import SingleColumnLayout from '@/layouts/columns/SingleColumnLayout.vue'
 import request from '@/utils/request'
-import type { TCourseStructure } from '@/types/api/editor-responses'
 import { PageStatus } from '@/constants/PageStatus'
 import CourseCard from '@/Viewer/components/CourseCard/CourseCard.vue'
+import type { ViewerCourseResponse } from '@/types/api-types'
 
 export default defineComponent({
     components: { CourseCard, SingleColumnLayout },
     data() {
         return {
-            featuredCourses: [] as TCourseStructure[],
+            featuredCourses: [] as ViewerCourseResponse[],
             searchText: '',
-            searchedCourses: [] as TCourseStructure[],
+            searchedCourses: [] as ViewerCourseResponse[],
             searchTimeout: 0,
             searchRequest: new Promise(() => {}),
             searchRequestController: new AbortController(),
@@ -59,12 +59,12 @@ export default defineComponent({
             if (val && val.length > 4) {
                 this.searchTimeout = setTimeout(() => this.search(val), 500)
             } else {
-                this.searchedCourses = [] as TCourseStructure[]
+                this.searchedCourses = [] as ViewerCourseResponse[]
             }
         }
     },
     created() {
-        request<TCourseStructure>('/api/viewer/courses/featured').then(({ data, errors }) => {
+        request<ViewerCourseResponse>('/api/viewer/courses/featured').then(({ data, errors }) => {
             if (!errors.length && data) {
                 this.featuredCourses = [data]
                 this.pageStatus = PageStatus.ready
@@ -78,7 +78,7 @@ export default defineComponent({
             this.searchRequestController = new AbortController()
             const { signal } = this.searchRequestController
             this.searchState = PageStatus.loading
-            request<TCourseStructure[]>(
+            request<ViewerCourseResponse[]>(
                 `/api/viewer/courses/search?text=${encodeURIComponent(text)}`,
                 {
                     signal

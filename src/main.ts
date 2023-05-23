@@ -1,7 +1,5 @@
 import { createApp } from 'vue'
 
-// @ts-ignore
-// import { createI18n } from 'vue-i18n/dist/vue-i18n.esm-bundler'
 import elementPlus from 'element-plus'
 import { createPinia } from 'pinia'
 import App from './App.vue'

@@ -23,18 +23,18 @@
 import { defineComponent } from 'vue'
 import SingleColumnLayout from '@/layouts/columns/SingleColumnLayout.vue'
 import CourseCard from '@/Editor/components/CourseCard/CourseCard.vue'
-import { TCourseStructure } from '@/types/api/editor-responses'
+import type { ViewerCourseResponse } from '@/types/api-types'
 import request from '@/utils/request'
 
 export default defineComponent({
     components: { CourseCard, SingleColumnLayout },
     data() {
         return {
-            courses: [] as TCourseStructure[]
+            courses: [] as ViewerCourseResponse[]
         }
     },
     created() {
-        request<TCourseStructure[]>('/api/editor/courses').then(({ data, errors }) => {
+        request<ViewerCourseResponse[]>('/api/editor/courses').then(({ data, errors }) => {
             if (errors.length === 0) {
                 this.courses = data!
             }

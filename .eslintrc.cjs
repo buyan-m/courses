@@ -69,5 +69,28 @@ module.exports = {
                 devDependencies: true,
             }],
         },
+    }, {
+        files: ['scripts/**/*.ts', 'scripts/*.ts'],
+        parserOptions: {
+            project: ['./scripts/tsconfig.json'],
+            settings: {
+                'import/resolver': {
+                    typescript: {
+                        project: './scripts/tsconfig.json',
+                    },
+                },
+            },
+        },
+        rules: {
+            'import/no-extraneous-dependencies': ['error', {
+                devDependencies: true,
+            }],
+        },
+    },{
+        files: ['src/types/api-types.ts'],
+        rules: {
+            'max-classes-per-file': 'off',
+            'max-len': 'off'
+        }
     }],
 }

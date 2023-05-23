@@ -9,8 +9,8 @@
 import EditorBasicLayout from '@/Editor/layouts/EditorBasicLayout.vue'
 import { defineComponent } from 'vue'
 import request from '@/utils/request'
-import type { TAuthCheckResponse } from '@/types/api/editor-responses'
-import { Role } from '@/constants/Role'
+import type { AuthCheckResponse } from '@/types/api-types'
+import { Roles } from '@/types/api-types'
 
 export default defineComponent({
     components: {
@@ -22,8 +22,8 @@ export default defineComponent({
         }
     },
     created() {
-        request<TAuthCheckResponse>('/api/auth-check').then(({ data }) => {
-            if (data && data.roles.some((role) => role === Role.guest)) {
+        request<AuthCheckResponse>('/api/auth-check').then(({ data }) => {
+            if (data && data.roles.some((role) => role === Roles.guest)) {
                 this.guestWarning = this.$t('guest-warn')
             }
         })

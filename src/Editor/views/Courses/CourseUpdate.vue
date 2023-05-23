@@ -50,7 +50,7 @@ import { PageStatus } from '@/constants/PageStatus'
 import SingleColumnLayout from '@/layouts/columns/SingleColumnLayout.vue'
 import HeadingEditable from '@/Editor/components/HeadingEditable/HeadingEditable.vue'
 import CourseLessons from '@/Editor/components/CourseLessons/CourseLessons.vue'
-import type { TLesson } from '@/types/api/editor-responses'
+import type { LessonUpdateDTO } from '@/types/api-types'
 import { CourseStatus } from '@/constants/CourseStatus'
 import { useCourseUpdateStore } from './CourseUpdate.store'
 
@@ -93,7 +93,7 @@ function saveCourse() {
     }, 700)
 }
 
-function lessonChanged(lesson: TLesson) {
+function lessonChanged(lesson: LessonUpdateDTO) {
     $store.saveLesson(lesson)
 }
 

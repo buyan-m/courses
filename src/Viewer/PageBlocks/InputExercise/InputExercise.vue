@@ -20,14 +20,15 @@
                 </template>
             </el-input>
         </el-form-item>
+        <el-form-item v-if="answer && answer.feedback" />
     </el-form>
 </template>
 <script lang="ts" setup>
 import { defineProps, ref, watch } from 'vue'
 import { FormInstance } from 'element-plus'
-import { TTextAnswer } from '@/types/api/learning-responses'
+import type { TextAnswer } from '@/types/api-types'
 
-const props = defineProps<{ answers: string[], answer?: TTextAnswer }>()
+const props = defineProps<{ answers: string[], answer?: TextAnswer }>()
 const emit = defineEmits(['answer'])
 const answer = ref({ text: '' })
 const inputClass = ref('')
@@ -41,7 +42,7 @@ function checkAnswer(value: string) {
     return false
 }
 
-function alreadyAnsweredCallback(alreadyAnsweredValue?: TTextAnswer) {
+function alreadyAnsweredCallback(alreadyAnsweredValue?: TextAnswer) {
     if (alreadyAnsweredValue) {
         answer.value.text = alreadyAnsweredValue.value
         inputDisabled.value = true

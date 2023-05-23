@@ -29,7 +29,7 @@ import SingleColumnLayout from '@/layouts/columns/SingleColumnLayout.vue'
 import { PageStatus } from '@/constants/PageStatus'
 import { defineComponent } from 'vue'
 import request from '@/utils/request'
-import type { TCourseStructure } from '@/types/api/editor-responses'
+import type { CourseResponse } from '@/types/api-types'
 import LessonCard from '@/Viewer/components/LessonCard/LessonCard.vue'
 
 export default defineComponent({
@@ -42,7 +42,7 @@ export default defineComponent({
                 name: '',
                 description: '',
                 lessons: []
-            } as TCourseStructure,
+            } as CourseResponse,
             pageStatus: PageStatus.loading
         }
     },
@@ -60,7 +60,7 @@ export default defineComponent({
     created() {
         const { courseId } = this.$route.params
         if (courseId) {
-            request<TCourseStructure>(`/api/viewer/courses/${courseId}`).then(({ data }) => {
+            request<CourseResponse>(`/api/viewer/courses/${courseId}`).then(({ data }) => {
                 this.course = data!
                 this.pageStatus = PageStatus.ready
             })

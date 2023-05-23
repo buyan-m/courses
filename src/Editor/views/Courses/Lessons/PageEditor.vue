@@ -40,7 +40,7 @@ import HeadingEditable from '@/Editor/components/HeadingEditable/HeadingEditable
 import type { OutputData as TEditorOutputData } from '@editorjs/editorjs'
 import { PageStatus } from '@/constants/PageStatus'
 import request from '@/utils/request'
-import type { TPage, TPageCreateResponse } from '@/types/api/editor-responses'
+import type { Page, EditorPageCreateResponse } from '@/types/api-types'
 import SingleColumnLayout from '@/layouts/columns/SingleColumnLayout.vue'
 
 export default defineComponent({
@@ -59,7 +59,7 @@ export default defineComponent({
                         data: { text: 'Hello! Let me introduce our editor' }
                     }
                 ]
-            } as TPage['structure'],
+            } as Page['structure'],
             page: { name: 'placeholder', updatedName: 'placeholder', isAnswersVisible: true },
             pageStatus: PageStatus.loading as PageStatus,
             errorText: ''
@@ -67,12 +67,12 @@ export default defineComponent({
     },
     computed: {
         shouldWeShowEditor() {
-            return this.pageStatus === PageStatus.ready
+            return this.pageStatus === PageStatus.ready || this.pageStatus === PageStatus.updating
         }
     },
     created() {
         if (this.$route.params.pageId) {
-            request<TPage>(`/api/editor/pages/${this.$route.params.pageId}`).then(({ data, errors }) => {
+            request<Page>(`/api/editor/pages/${this.$route.params.pageId}`).then(({ data, errors }) => {
                 if (data) {
                     this.initialPageStructure = data.structure
                     this.pageStatus = PageStatus.ready
@@ -92,10 +92,10 @@ export default defineComponent({
             const routeId = this.$route.params.pageId || 'create'
             const { lessonId } = this.$route.params
             this.pageStatus = PageStatus.updating
-            request<TPageCreateResponse>(
+            request<EditorPageCreateResponse>(
                 `/api/editor/pages/${routeId}`,
                 {
-                    method: 'POST',
+                    method: routeId === 'create' ? 'POST' : 'PUT',
                     headers: {
                         'Content-Type': 'application/json'
                     },
@@ -103,7 +103,8 @@ export default defineComponent({
                         name: this.page.updatedName,
                         isAnswersVisible: this.page.isAnswersVisible,
                         structure: content,
-                        lessonId
+                        lessonId,
+                        position: 0 // TODO: add position control
                     })
                 }
             ).then(({ data, errors }) => {

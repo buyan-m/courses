@@ -27,12 +27,11 @@
 import {
     defineProps, defineEmits, ref, useCssModule, watch
 } from 'vue'
-import type { TOption } from '@/types/api/page-content'
-import type { TRadioAnswer } from '@/types/api/learning-responses'
+import type { RadioAnswer, Option } from '@/types/api-types'
 import OriginalAnswers from '@/Viewer/PageBlocks/OriginalAnswers/OriginalAnswers.vue'
 
 const $styles = useCssModule()
-const props = defineProps<{ options: TOption[], answer?: TRadioAnswer }>()
+const props = defineProps<{ options: Option[], answer?: RadioAnswer }>()
 const emit = defineEmits(['answer'])
 
 const answerChecked = ref(false)
@@ -40,7 +39,7 @@ const checkedAnswerIndex = ref(-1)
 const originalValue = ref('')
 const isOriginalValueVisible = ref(false)
 
-function alreadyAnsweredCallback(answer?: TRadioAnswer) {
+function alreadyAnsweredCallback(answer?: RadioAnswer) {
     if (answer) {
         checkedAnswerIndex.value = props.options.findIndex(({ value }) => answer.value === value)
         if (checkedAnswerIndex.value === -1) {

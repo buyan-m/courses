@@ -3,11 +3,12 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "build": "vue-cli-service build",
+    "build": "npm run types:fetch && vue-cli-service build",
+    "types:fetch": "ts-node --project ./scripts/tsconfig.json ./scripts/types-fetch.ts && eslint ./src/types/api-types.ts --fix",
     "test:pre": "ts-node --project ./e2e/tsconfig.json ./e2e/pre-run.ts",
     "test:e2e": "npm run test:pre && playwright test",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
-    "dev": "vue-cli-service serve",
+    "dev": "npm run types:fetch && vue-cli-service serve",
     "i18n:report": "vue-cli-service i18n:report --src \"./src/**/*.?(js|vue)\" --locales \"./src/locales/**/*.json\""
   },
   "dependencies": {

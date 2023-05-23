@@ -50,13 +50,13 @@
 </template>
 <script lang="ts">
 import { defineComponent } from 'vue'
-import type { TLesson } from '@/types/api/editor-responses'
+import type { LessonResponse } from '@/types/api-types'
 
 export default defineComponent({
     props: {
         lessons: {
             type: Array,
-            default: () => [] as TLesson[]
+            default: () => [] as LessonResponse[]
         },
         courseId: {
             type: String,
@@ -64,30 +64,30 @@ export default defineComponent({
         }
     },
     emits: {
-        saveLesson: (lesson: TLesson) => !!lesson
+        saveLesson: (lesson: LessonResponse) => !!lesson
     },
 
     data() {
         return {
             changeLessonTimeout: 0,
-            computedLessons: [] as TLesson[]
+            computedLessons: [] as LessonResponse[]
         }
     },
     watch: {
         lessons: {
-            handler(val: TLesson[]) {
-                this.computedLessons = val.map((el: TLesson) => ({ ...el }))
+            handler(val: LessonResponse[]) {
+                this.computedLessons = val.map((el: LessonResponse) => ({ ...el }))
             },
             deep: true
         }
     },
 
     created() {
-        this.computedLessons = (this.lessons as TLesson[]).map((el: TLesson) => ({ ...el }))
+        this.computedLessons = (this.lessons as LessonResponse[]).map((el) => ({ ...el }))
     },
 
     methods: {
-        lessonChanged(lesson: TLesson) {
+        lessonChanged(lesson: LessonResponse) {
             if (this.changeLessonTimeout) {
                 clearTimeout(this.changeLessonTimeout)
             }

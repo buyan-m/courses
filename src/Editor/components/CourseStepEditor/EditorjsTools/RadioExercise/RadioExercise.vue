@@ -39,7 +39,7 @@
 </template>
 <script lang="ts">
 import { defineComponent } from 'vue'
-import type { TOption } from '@/types/api/page-content'
+import type { Option } from '@/types/api-types'
 
 export default defineComponent({
     props: {
@@ -50,7 +50,7 @@ export default defineComponent({
     },
     data() {
         return {
-            innerOptions: [] as TOption[],
+            innerOptions: [] as Option[],
             radioCheck: -1
         }
     },
@@ -65,8 +65,8 @@ export default defineComponent({
         }
     },
     created() {
-        this.innerOptions = (this.options as TOption[]).map((el) => ({ ...el }))
-        this.radioCheck = this.innerOptions.findIndex((el: TOption) => el.isCorrect)
+        this.innerOptions = (this.options as Option[]).map((el) => ({ ...el }))
+        this.radioCheck = this.innerOptions.findIndex((el: Option) => el.isCorrect)
     },
     methods: {
         addOption() {

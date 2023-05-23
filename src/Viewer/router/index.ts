@@ -25,6 +25,11 @@ export default {
                             path: 'page/:pageId',
                             name: 'viewer-lesson-page',
                             component: () => import('@/Viewer/views/Course/Lesson/LessonPage.vue')
+                        },
+                        {
+                            path: 'page/:pageId/:studentId',
+                            name: 'viewer-lesson-teacher-page',
+                            component: () => import('@/Viewer/views/Course/Lesson/LessonPage.vue')
                         }
                     ]
                 }

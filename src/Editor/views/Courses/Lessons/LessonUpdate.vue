@@ -37,8 +37,9 @@ import HeadingEditable from '@/Editor/components/HeadingEditable/HeadingEditable
 import { PageStatus } from '@/constants/PageStatus'
 import { defineComponent } from 'vue'
 import request from '@/utils/request'
-import type { TLesson, TLessonCreateResponse, TPage } from '@/types/api/editor-responses'
-import type { TPageId } from '@/types/api/common'
+import type {
+    TPageId, LessonResponse, EditorLessonCreateResponse, Page
+} from '@/types/api-types'
 import { RouteLocationRaw } from 'vue-router'
 
 export default defineComponent({
@@ -48,7 +49,7 @@ export default defineComponent({
         return {
             lesson: {
                 name: '',
-                pages: [] as TLesson['pages']
+                pages: [] as LessonResponse['pages']
             },
             updatedName: 'Lesson',
             pageStatus: PageStatus.loading
@@ -68,7 +69,7 @@ export default defineComponent({
     },
     created() {
         if (this.lessonId) {
-            request<TLesson>(`/api/editor/lessons/${this.lessonId}`).then(({ data }) => {
+            request<LessonResponse>(`/api/editor/lessons/${this.lessonId}`).then(({ data }) => {
                 if (data) {
                     this.lesson = data
                     this.updatedName = data.name
@@ -87,7 +88,7 @@ export default defineComponent({
             const routeId = this.$route.params.lessonId || 'create'
             const { courseId } = this.$route.params
 
-            request<TLessonCreateResponse>(
+            request<EditorLessonCreateResponse>(
                 `/api/editor/lessons/${routeId}`,
                 {
                     method: 'POST',
@@ -104,7 +105,10 @@ export default defineComponent({
             ).then(({ data }) => {
                 if (data) {
                     if (!this.$route.params.lessonId) {
-                        this.$router.push({ name: 'editor-lesson-update', params: { lessonId: data.lessonId, courseId } })
+                        this.$router.push({
+                            name: 'editor-lesson-update',
+                            params: { lessonId: data.lessonId, courseId }
+                        })
                     }
                 } else {
                     // handle error
@@ -118,7 +122,8 @@ export default defineComponent({
 
         removePage(pageId: TPageId) {
             request(`/api/editor/pages/${pageId}`, { method: 'delete' }).then(() => {
-                // this.lesson.pages = this.lesson.pages.filter<Omit<TPage, 'structure'>>((page: TPage) => page._id !== pageId)
+                // this.lesson.pages = this.lesson.pages
+                // .filter<Omit<TPage, 'structure'>>((page: TPage) => page._id !== pageId)
             })
         }
     }

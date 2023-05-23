@@ -1,6 +1,6 @@
 import './styles.css'
 import type { API, BaseTool } from '@editorjs/editorjs'
-import type { TEditorBlockVideo } from '@/types/api/page-content'
+import type { TEditorBlockVideo } from '@/types/api-types'
 import { createYoutubeURL } from '@/utils/embeds'
 
 type TVideoConstructorParams = {

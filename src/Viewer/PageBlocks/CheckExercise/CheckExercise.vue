@@ -23,12 +23,11 @@
 import {
     defineProps, ref, useCssModule, watch
 } from 'vue'
-import type { TOption } from '@/types/api/page-content'
-import { TCheckAnswer } from '@/types/api/learning-responses'
+import type { CheckAnswer, Option } from '@/types/api-types'
 import OriginalAnswers from '@/Viewer/PageBlocks/OriginalAnswers/OriginalAnswers.vue'
 
 const $styles = useCssModule()
-const props = defineProps<{ options: TOption[], answer?: TCheckAnswer }>()
+const props = defineProps<{ options: Option[], answer?: CheckAnswer }>()
 const emit = defineEmits(['answer'])
 const innerOptions = ref(props.options.map((el) => ({
     checked: false,
@@ -49,7 +48,7 @@ function checkAnswer() {
     )
 }
 
-function alreadyAnsweredCallback(alreadyAnsweredValue?: TCheckAnswer) {
+function alreadyAnsweredCallback(alreadyAnsweredValue?: CheckAnswer) {
     if (alreadyAnsweredValue) {
         alreadyAnsweredValue.value.forEach((el) => {
             const element = innerOptions.value.find(({ value }) => value === el)
@@ -63,7 +62,7 @@ function alreadyAnsweredCallback(alreadyAnsweredValue?: TCheckAnswer) {
     }
 }
 
-function getOptionStyles(option: TOption & { checked: boolean }) {
+function getOptionStyles(option: Option & { checked: boolean }) {
     if (option.checked) {
         return `${$styles.row} ${option.isCorrect ? $styles.correctRow : $styles.wrongRow}`
     }

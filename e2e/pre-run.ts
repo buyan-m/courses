@@ -21,7 +21,7 @@ try {
 } catch (e) { /* */ }
 
 function getNewToken() {
-    axiosInstance.post('https://localhost:8080/api/auth', authCredentials.logIn)
+    axiosInstance.post('https://localhost:7080/api/auth', authCredentials.logIn)
         .then((resp) => {
             const cookie = resp.headers['set-cookie']
             if (cookie && cookie[0]) {

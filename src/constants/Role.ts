@@ -1,6 +1,1 @@
-export enum Role {
-    guest = 'guest',
-    user = 'user',
-    admin = 'admin',
-    moderator = 'moderator'
-}
+export { Roles } from '@/types/api-types' // backend-schema.ts

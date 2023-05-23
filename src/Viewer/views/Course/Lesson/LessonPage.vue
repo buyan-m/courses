@@ -1,26 +1,34 @@
 <template>
     <SingleColumnLayout v-loading="pageStatus === 'loading'">
         <h1>
-            {{ $store.heading }}
+            {{ $lessonStore.heading }}
         </h1>
         <LessonPageContent
-            :content="$store.pageContent"
-            :saved-answers="$store.savedAnswers"
-            @answersReceived="answersReceived"
+            :content="$lessonStore.pageContent"
+            :saved-answers="$lessonStore.savedAnswers"
+            @answers-received="answersReceived"
+            @feedback-updated="updateFeedback"
         />
+        <template v-if="!$lessonStore.isUserTeacher">
+            <el-button
+                v-if="$lessonStore.nextPage"
+                :disabled="!$lessonStore.pageCompleted"
+                @click="goToNextPage"
+            >
+                {{ $t('next') }}
+            </el-button>
+            <el-button
+                v-if="!$lessonStore.nextPage"
+                :disabled="!$lessonStore.pageCompleted"
+                @click="completeLesson"
+            >
+                {{ $t('done') }}
+            </el-button>
+        </template>
         <el-button
-            v-if="$store.nextPage"
-            :disabled="!$store.pageCompleted"
-            @click="goToNextPage"
+            @click="saveFeedback"
         >
-            next
-        </el-button>
-        <el-button
-            v-if="!$store.nextPage"
-            :disabled="!$store.pageCompleted"
-            @click="completeLesson"
-        >
-            done
+            {{ $t('save-feedback') }}
         </el-button>
     </SingleColumnLayout>
 </template>
@@ -30,35 +38,43 @@ import { useRoute, useRouter } from 'vue-router'
 import SingleColumnLayout from '@/layouts/columns/SingleColumnLayout.vue'
 import LessonPageContent from '@/Viewer/components/LessonPageContent/LessonPageContent.vue'
 import { PageStatus } from '@/constants/PageStatus'
-import { TTestAnswer } from '@/types/api/learning-responses'
+import type { AnswerFeedback, AnswerWithId } from '@/types/api-types'
 import { useLessonPageStore } from './LessonPage.store'
 
-const $store = useLessonPageStore()
+const $lessonStore = useLessonPageStore()
 const $route = useRoute()
 const $router = useRouter()
 
 const pageStatus = ref<PageStatus>(PageStatus.loading)
 
-const { pageId } = $route.params
+const { pageId, studentId } = $route.params
 
 function updateContent() {
     pageStatus.value = PageStatus.loading
 
-    return $store.getLessonPage(pageId as string).then(() => {
+    return $lessonStore.getLessonPage(pageId as string, studentId as string).then(() => {
         pageStatus.value = PageStatus.ready
     }, () => {
         pageStatus.value = PageStatus.error
     })
 }
 
-function answersReceived(answers: TTestAnswer[]) {
-    $store.setAnswers(answers)
+function answersReceived(answers: AnswerWithId[]) {
+    $lessonStore.setAnswers(answers)
+}
+
+function saveFeedback() {
+    $lessonStore.sendFeedbackToStudent()
+}
+
+function updateFeedback({ id, answerFeedback }: { id: string, answerFeedback: AnswerFeedback }) {
+    $lessonStore.updateFeedback({ id, answerFeedback })
 }
 
 function goToNextPage() {
     pageStatus.value = PageStatus.loading
 
-    $store.getNextPage().then((nextPageId) => {
+    $lessonStore.getNextPage().then((nextPageId) => {
         if (nextPageId) {
             $router.push({
                 name: 'viewer-lesson-page',
@@ -80,7 +96,7 @@ function goToNextPage() {
 function completeLesson() {
     pageStatus.value = PageStatus.loading
 
-    $store.completeLesson($route.params.lessonId as string)
+    $lessonStore.completeLesson($route.params.lessonId as string)
         .then(() => {
             $router.push({
                 name: 'viewer-course',
@@ -104,3 +120,12 @@ watch(() => pageId, (value) => {
 
 updateContent()
 </script>
+<i18n>
+{
+    "en": {
+        "next": "Next page",
+        "done": "Complete the lesson",
+        "save-feedback":  "Send the feedback"
+    }
+}
+</i18n>
