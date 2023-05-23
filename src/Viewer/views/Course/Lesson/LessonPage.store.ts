@@ -9,7 +9,7 @@ export const useLessonPageStore = defineStore('lessonPage', {
         currentPageId: '',
         currentStudentId: '',
         heading: '',
-        pageContent: { blocks: [], version: '' } as ViewerPageResponse['structure'],
+        pageContent: { blocks: [], version: '', time: 0 } as ViewerPageResponse['structure'],
         nextPage: false,
         pageCompleted: false,
         answers: [] as AnswerWithId[],
