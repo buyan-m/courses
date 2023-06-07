@@ -11,7 +11,7 @@ const axiosInstance = axios.create({
     })
 })
 
-axiosInstance.get('http://localhost:3000/api-schema')
+axiosInstance.get('http://nest-back:3000/api-schema')
     .then((resp) => {
         if (resp.status === 200) {
             writeFileSync(path.resolve(__dirname, '../src/types/api-types.ts'), resp.data)

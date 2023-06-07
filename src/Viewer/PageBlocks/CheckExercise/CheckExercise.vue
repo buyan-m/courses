@@ -1,5 +1,7 @@
 <template>
-    <el-form>
+    <el-form
+        data-test="checkboxExercise"
+    >
         <el-form-item
             v-for="(option, index) in innerOptions"
             :key="index"
@@ -13,6 +15,12 @@
                 {{ option.value }}
             </el-checkbox>
         </el-form-item>
+        <AnswerFeedback
+            v-if="answer"
+            :answer="answer"
+            :is-editable="isTeacher"
+            @save-feedback="saveFeedback"
+        />
         <OriginalAnswers
             v-if="originalAnswers.length"
             :original-answers="originalAnswers"
@@ -25,15 +33,28 @@ import {
 } from 'vue'
 import type { CheckAnswer, Option } from '@/types/api-types'
 import OriginalAnswers from '@/Viewer/PageBlocks/OriginalAnswers/OriginalAnswers.vue'
+import AnswerFeedback from '@/Viewer/PageBlocks/AnswerFeedback/AnswerFeedback.vue'
+import { TAnswerFeedback } from '@/types/api-types'
 
 const $styles = useCssModule()
-const props = defineProps<{ options: Option[], answer?: CheckAnswer }>()
-const emit = defineEmits(['answer'])
+const props = defineProps<{
+    options: Option[],
+    answer?: CheckAnswer,
+    isTeacher: boolean
+}>()
+const emit = defineEmits<{
+    answer: [text: string[]],
+    saveFeedback: [fb: TAnswerFeedback]
+}>()
 const innerOptions = ref(props.options.map((el) => ({
     checked: false,
     ...el
 })))
 const originalAnswers = ref([] as string[])
+
+function saveFeedback(feedback: TAnswerFeedback) {
+    emit('saveFeedback', feedback)
+}
 
 function checkAnswer() {
     if (innerOptions.value.some((el) => !el.checked && el.isCorrect)) {
