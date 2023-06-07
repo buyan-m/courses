@@ -1,5 +1,7 @@
 <template>
-    <el-form>
+    <el-form
+        data-test="radioExercise"
+    >
         <el-radio-group
             v-model="checkedAnswerIndex"
             @change="checkAnswer"
@@ -17,6 +19,12 @@
                 </el-radio>
             </el-form-item>
         </el-radio-group>
+        <AnswerFeedback
+            v-if="answer"
+            :answer="answer"
+            :is-editable="isTeacher"
+            @save-feedback="saveFeedback"
+        />
         <OriginalAnswers
             v-if="isOriginalValueVisible"
             :original-answers="[originalValue]"
@@ -25,19 +33,32 @@
 </template>
 <script lang="ts" setup>
 import {
-    defineProps, defineEmits, ref, useCssModule, watch
+    defineEmits, defineProps, ref, useCssModule, watch
 } from 'vue'
-import type { RadioAnswer, Option } from '@/types/api-types'
+import type { Option, RadioAnswer } from '@/types/api-types'
+import { TAnswerFeedback } from '@/types/api-types'
 import OriginalAnswers from '@/Viewer/PageBlocks/OriginalAnswers/OriginalAnswers.vue'
+import AnswerFeedback from '@/Viewer/PageBlocks/AnswerFeedback/AnswerFeedback.vue'
 
 const $styles = useCssModule()
-const props = defineProps<{ options: Option[], answer?: RadioAnswer }>()
-const emit = defineEmits(['answer'])
+const props = defineProps<{
+    options: Option[],
+    answer?: RadioAnswer,
+    isTeacher: boolean
+}>()
+const emit = defineEmits<{
+    answer:[answer: string],
+    saveFeedback: [fb: TAnswerFeedback]
+}>()
 
 const answerChecked = ref(false)
 const checkedAnswerIndex = ref(-1)
 const originalValue = ref('')
 const isOriginalValueVisible = ref(false)
+
+function saveFeedback(feedback: TAnswerFeedback) {
+    emit('saveFeedback', feedback)
+}
 
 function alreadyAnsweredCallback(answer?: RadioAnswer) {
     if (answer) {

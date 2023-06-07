@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "build": "npm run types:fetch && vue-cli-service build",
+    "build": "vue-cli-service build",
     "types:fetch": "ts-node --project ./scripts/tsconfig.json ./scripts/types-fetch.ts && eslint ./src/types/api-types.ts --fix",
     "test:pre": "ts-node --project ./e2e/tsconfig.json ./e2e/pre-run.ts",
     "test:e2e": "npm run test:pre && playwright test",
@@ -12,7 +12,7 @@
     "i18n:report": "vue-cli-service i18n:report --src \"./src/**/*.?(js|vue)\" --locales \"./src/locales/**/*.json\""
   },
   "dependencies": {
-    "@editorjs/editorjs": "^2.25.0",
+    "@editorjs/editorjs": "^2.27.0",
     "@editorjs/header": "^2.6.2",
     "@editorjs/image": "^2.7.1",
     "@editorjs/list": "^1.7.0",

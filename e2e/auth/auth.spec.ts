@@ -37,7 +37,7 @@ test.describe('Auth', () => {
 
         test('Log in with email only', async ({ page }) => {
             const authPage = new AuthPage(page)
-            await authPage.emailField.fill(credentials.logIn.email)
+            await authPage.emailField.fill(credentials.logIn.editor.email)
             await authPage.passwordField.clear()
             await authPage.loginButton.click()
             await expect(authPage.emailRow).not.toHaveClass(fieldErrorClass)
@@ -46,7 +46,7 @@ test.describe('Auth', () => {
         test('Log in with password only', async ({ page }) => {
             const authPage = new AuthPage(page)
             await authPage.emailField.clear()
-            await authPage.passwordField.fill(credentials.logIn.password)
+            await authPage.passwordField.fill(credentials.logIn.editor.password)
             await authPage.loginButton.click()
             await expect(authPage.emailRow).toHaveClass(fieldErrorClass)
             await expect(authPage.passwordRow).not.toHaveClass(fieldErrorClass)
@@ -63,7 +63,7 @@ test.describe('Auth', () => {
         })
         test('Log in with incorrect password', async ({ page }) => {
             const authPage = new AuthPage(page)
-            await authPage.emailField.fill(credentials.logIn.email)
+            await authPage.emailField.fill(credentials.logIn.editor.email)
             await authPage.passwordField.fill(credentials.create.password)
             await authPage.loginButton.click()
             await expect(authPage.emailRow).not.toHaveClass(fieldErrorClass)
@@ -74,8 +74,8 @@ test.describe('Auth', () => {
             const authPage = new AuthPage(page)
             await page.goto(routes.coursesPage)
             await expect(page).toHaveURL(routes.authPageWithRedirect)
-            await authPage.emailField.fill(credentials.logIn.email)
-            await authPage.passwordField.fill(credentials.logIn.password)
+            await authPage.emailField.fill(credentials.logIn.editor.email)
+            await authPage.passwordField.fill(credentials.logIn.editor.password)
             await authPage.loginButton.click()
             await expect(authPage.emailRow).not.toHaveClass(fieldErrorClass)
             await expect(authPage.passwordRow).not.toHaveClass(fieldErrorClass)
@@ -100,7 +100,7 @@ test.describe('Auth', () => {
         })
         test('Register with incorrect email', async ({ page }) => {
             const authPage = new AuthPage(page)
-            await authPage.emailField.fill(credentials.logIn.email)
+            await authPage.emailField.fill(credentials.logIn.editor.email)
             await authPage.nameField.fill('qwertin')
             await authPage.passwordField.fill(credentials.create.password)
             await authPage.registerButton.click()
@@ -110,7 +110,7 @@ test.describe('Auth', () => {
         })
         test('Register without name', async ({ page }) => {
             const authPage = new AuthPage(page)
-            await authPage.emailField.fill(credentials.logIn.email)
+            await authPage.emailField.fill(credentials.logIn.editor.email)
             await authPage.nameField.clear()
             await authPage.passwordField.fill(credentials.create.password)
             await authPage.registerButton.click()

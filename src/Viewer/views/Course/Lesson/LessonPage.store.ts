@@ -31,6 +31,9 @@ export const useLessonPageStore = defineStore('lessonPage', {
             if (studentId) {
                 answersRequest = request<AnswersDTO>(`/api/learning/answers/${pageId}/${studentId}`)
                     .then((response) => {
+                        if (response.errors.length > 0) {
+                            throw new Error(response.errors[0])
+                        }
                         if (response.data) {
                             this.isUserTeacher = true
                             this.currentStudentId = studentId
@@ -47,6 +50,16 @@ export const useLessonPageStore = defineStore('lessonPage', {
                     })
             } else {
                 answersRequest = request<AnswersDTO>(`/api/learning/answers/${pageId}`)
+                    .then(({ data, errors }) => {
+                        // todo: use statusCodes, update request.ts
+                        if (errors[0]) {
+                            if (errors[0] === 'Error: Not Found') {
+                                return { data, errors: [] }
+                            }
+                            return Promise.reject(errors[0])
+                        }
+                        return { data, errors }
+                    })
             }
 
             return Promise.all([
@@ -87,15 +100,18 @@ export const useLessonPageStore = defineStore('lessonPage', {
             })
         },
 
-        updateFeedback({ id, answerFeedback }: { id: string, answerFeedback: AnswerFeedback }) {
-            this.updatedFeedbacks[id] = answerFeedback
+        updateFeedback({ id, answer }: AnswerWithId) {
+            this.updatedFeedbacks[id] = {
+                correctness: answer.correctness,
+                feedback: answer.feedback
+            }
         },
 
         sendFeedbackToStudent() {
             return request(`/api/learning/answers-feedback/${this.currentPageId}/${this.currentStudentId}`, {
                 method: 'put',
                 body: JSON.stringify(this.updatedFeedbacks)
-            })
+            }).then(({ errors }) => (errors.length ? Promise.reject(errors[0]) : undefined))
         },
 
         getNextPage() {
@@ -130,6 +146,12 @@ export const useLessonPageStore = defineStore('lessonPage', {
         setAnswers(answers: AnswerWithId[]) {
             this.answers = answers
             this.pageCompleted = true
+        },
+
+        resetAnswers() {
+            return request(`/api/learning/answers/${this.currentPageId}/${this.currentStudentId}`, {
+                method: 'DELETE'
+            })
         }
     }
 })

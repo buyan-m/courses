@@ -1,6 +1,7 @@
 <template>
     <el-form
         :class="$style.form"
+        data-test="radioExercise"
         @submit.prevent
     >
         <el-form-item
@@ -64,7 +65,7 @@ export default defineComponent({
             }
         }
     },
-    created() {
+    mounted() {
         this.innerOptions = (this.options as Option[]).map((el) => ({ ...el }))
         this.radioCheck = this.innerOptions.findIndex((el: Option) => el.isCorrect)
     },

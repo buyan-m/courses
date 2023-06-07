@@ -11,18 +11,34 @@ import SoundCloud from '@/Viewer/PageBlocks/SoundCloud/SoundCloud.vue'
 import ViewerImageWrapper from '@/Viewer/PageBlocks/ViewerImageWrapper/ViewerImageWrapper.vue'
 import { createYoutubeURL } from '@/utils/embeds'
 import type {
-    TAnswer, AnswerWithId, PageViewerDTO as ViewerPageResponse, EditorBlockType, Option
+    TAnswer, AnswerWithId, PageViewerDTO as ViewerPageResponse, EditorBlockType, Option, TAnswerFeedback
 } from '@/types/api-types'
-import { AnswerCorrectness } from '@/types/api-types'
+import { AnswerCorrectness, AnswerTypes } from '@/types/api-types'
 
 type TConvertorInput = {
     data: unknown,
     passHandler?: (answer: unknown) => void,
+    feedbackHandler?: (feedback: TAnswerFeedback) => void,
     answer?: unknown
 }
 type TConvertor = (obj: TConvertorInput) => VNode
 
 const $style = useCssModule()
+
+const props = defineProps<{
+    content: ViewerPageResponse['structure'],
+    savedAnswers: Record<string, TAnswer>,
+    isTeacher: boolean
+}>()
+
+const emit = defineEmits<{
+    answersReceived:[answers: AnswerWithId[]],
+    feedbackUpdated: [answer: AnswerWithId],
+}>()
+
+const convertedBlocks = ref([] as VNode[])
+const questions = ref([] as string[])
+const answers = ref([] as AnswerWithId[])
 
 const CONVERTERS = {
     paragraph({ data } : TConvertorInput & { data: { text: string } }) {
@@ -53,42 +69,41 @@ const CONVERTERS = {
         return h('iframe', { src: createYoutubeURL(data.videoId), class: $style.youtubeEmbed })
     },
     radio({
-        data, passHandler, answer
+        data, passHandler, answer, feedbackHandler
     }: TConvertorInput & { data: { options: Option[] } }) {
         return h(RadioExercise, {
             options: data.options,
             answer,
-            onAnswer: passHandler
+            isTeacher: props.isTeacher,
+            onAnswer: passHandler,
+            onSaveFeedback: feedbackHandler
         })
     },
     checkbox({
-        data, passHandler, answer
+        data, passHandler, answer, feedbackHandler
     }: TConvertorInput & { data: { options: Option[] } }) {
         return h(CheckExercise, {
             options: data.options,
             answer,
-            onAnswer: passHandler
+            isTeacher: props.isTeacher,
+            onAnswer: passHandler,
+            onSaveFeedback: feedbackHandler
         })
     },
     input({
-        data, passHandler, answer
+        data, passHandler, answer, feedbackHandler
     }: TConvertorInput & { data: { answers: string[] } }) {
         return h(InputExercise, {
             answers: data.answers,
             answer,
-            onAnswer: passHandler
+            isTeacher: props.isTeacher,
+            onAnswer: passHandler,
+            onSaveFeedback: feedbackHandler
         })
     }
 } as Record<EditorBlockType, TConvertor>
 
-const TYPES_REQUIRE_ANSWER = ['radio', 'checkbox', 'input']
-const props = defineProps<{ content: ViewerPageResponse['structure'], savedAnswers: Record<string, TAnswer> }>()
-const emit = defineEmits(['answersReceived'])
-const convertedBlocks = ref([] as VNode[])
-const questions = ref([] as string[])
-const answers = ref([] as AnswerWithId[])
-
-function answerHandler(blockId: string, blockType: string) {
+function answerHandler(blockId: string, blockType: AnswerTypes) {
     questions.value.push(blockId)
     return (answer: unknown) => {
         questions.value = questions.value.filter((el) => el !== blockId)
@@ -103,14 +118,28 @@ function answerHandler(blockId: string, blockType: string) {
     }
 }
 
+function getFeedbackHandler(blockId: string) {
+    return ({ feedback, correctness }: TAnswerFeedback) => {
+        const answer = props.savedAnswers[blockId]
+        if (answer) {
+            answer.feedback = feedback
+            answer.correctness = correctness
+            emit('feedbackUpdated', { id: blockId, answer })
+        } else {
+            // send report
+        }
+    }
+}
+
 function convert(structure: ViewerPageResponse['structure']) {
     return structure.blocks.map((block) => {
-        if (TYPES_REQUIRE_ANSWER.indexOf(block.type) !== -1) {
+        if (Object.keys(AnswerTypes).indexOf(block.type) !== -1) {
             const answer = props.savedAnswers[block.id]
             return CONVERTERS[block.type](
                 {
                     data: block.data,
-                    passHandler: answerHandler(block.id, block.type),
+                    passHandler: answerHandler(block.id, block.type as unknown as AnswerTypes),
+                    feedbackHandler: getFeedbackHandler(block.id),
                     answer
                 }
             )
@@ -146,7 +175,9 @@ watch(() => questions.value, (newValue) => {
 const page = () => h('article', { 'data-test': 'pageContent' }, convertedBlocks.value)
 </script>
 <template>
-    <page :class="$style.lesson" />
+    <page
+        :class="$style.lesson"
+    />
 </template>
 <style module>
 .lesson {

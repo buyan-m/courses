@@ -61,6 +61,7 @@ export default defineComponent({
                 ]
             } as Page['structure'],
             page: { name: 'placeholder', updatedName: 'placeholder', isAnswersVisible: true },
+            position: 0,
             pageStatus: PageStatus.loading as PageStatus,
             errorText: ''
         }
@@ -75,6 +76,7 @@ export default defineComponent({
             request<Page>(`/api/editor/pages/${this.$route.params.pageId}`).then(({ data, errors }) => {
                 if (data) {
                     this.initialPageStructure = data.structure
+                    this.position = data.position
                     this.pageStatus = PageStatus.ready
                     this.page = { name: data.name, updatedName: data.name, isAnswersVisible: data.isAnswersVisible }
                 } else {
@@ -104,7 +106,7 @@ export default defineComponent({
                         isAnswersVisible: this.page.isAnswersVisible,
                         structure: content,
                         lessonId,
-                        position: 0 // TODO: add position control
+                        position: this.position // TODO: add position control
                     })
                 }
             ).then(({ data, errors }) => {

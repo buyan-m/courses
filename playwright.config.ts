@@ -1,5 +1,8 @@
 import type { PlaywrightTestConfig } from '@playwright/test'
 import { devices } from '@playwright/test'
+if (!process.env.BASE_URL) {
+   throw new Error('BASE_URL is not specified')
+}
 
 /**
  * Read environment variables from file.
@@ -37,7 +40,7 @@ const config: PlaywrightTestConfig = {
     /* Maximum time each action such as `click()` can take. Defaults to 0 (no limit). */
     actionTimeout: 5 * 1000,
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: 'https://localhost:7080/',
+    baseURL: process.env.BASE_URL,
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',

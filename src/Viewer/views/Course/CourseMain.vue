@@ -6,13 +6,30 @@
         <section :class="$style.teachingSection">
             <el-button
                 v-if="isTeachButtonVisible"
+                data-test="becomeTeacherButton"
                 @click="useCourseToTeach"
             >
                 {{ $t('teach') }}
             </el-button>
-            <span v-if="isUserTeacherOfTheCourse">
+            <div v-if="isUserTeacherOfTheCourse">
                 {{ $t('teaching') }}
-            </span>
+                {{ $t('invite') }}
+                <el-form data-test="inviteForm">
+                    <el-input
+                        v-model="studentId"
+                        data-test="inviteForm.input"
+                    >
+                        <template #append>
+                            <el-button
+                                data-test="inviteForm.submit"
+                                @click="sendInvite"
+                            >
+                                📧
+                            </el-button>
+                        </template>
+                    </el-input>
+                </el-form>
+            </div>
         </section>
 
         <div :class="$style.lessons">
@@ -43,7 +60,8 @@ export default defineComponent({
                 description: '',
                 lessons: []
             } as CourseResponse,
-            pageStatus: PageStatus.loading
+            pageStatus: PageStatus.loading,
+            studentId: ''
         }
     },
 
@@ -72,6 +90,20 @@ export default defineComponent({
     methods: {
         useCourseToTeach() {
             // became a teacher
+        },
+
+        sendInvite() {
+            request('/api/learning/invite', {
+                method: 'post',
+                body: JSON.stringify({
+                    userId: this.studentId,
+                    courseId: this.course._id
+                })
+            }).then(({ data, errors }) => {
+                if (!data && errors.length) {
+                    alert(errors[0])
+                }
+            })
         }
     }
 })

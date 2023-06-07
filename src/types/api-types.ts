@@ -153,6 +153,8 @@ export class ViewerCourseResponse extends CourseDTO {
     lessons: ViewerLessonResponse[]
 }
 export class CourseResponse extends CourseDTO {
+    _id: TCourseId
+
     lessons: LessonResponse[]
 }
 export class CourseUpdateDTO extends CourseDTO {
@@ -235,8 +237,8 @@ export class Student {
 }
 export enum AnswerTypes {
     radio = 'radio',
-    check = 'check',
-    text = 'text'
+    checkbox = 'checkbox',
+    input = 'input'
 }
 export enum AnswerCorrectness {
     'correct' = 'correct',
@@ -259,12 +261,12 @@ export class RadioAnswer extends AnswerFeedback implements AbstractAnswerWithFee
     value: string
 }
 export class CheckAnswer extends AnswerFeedback implements AbstractAnswerWithFeedback {
-    type: AnswerTypes.check
+    type: AnswerTypes.checkbox
 
     value: string[]
 }
 export class TextAnswer extends AnswerFeedback implements AbstractAnswerWithFeedback {
-    type: AnswerTypes.text
+    type: AnswerTypes.input
 
     value: string
 }
@@ -275,11 +277,12 @@ export class AnswerWithId {
     answer: TAnswer
 }
 export class AnswersDTO {
+    answers: AnswerWithId[]
+}
+export class PageAnswers extends AnswersDTO {
     studentId: TUserId
 
     pageId: TPageId
-
-    answers: AnswerWithId[]
 }
 
 export class AuthDto {
@@ -298,6 +301,22 @@ export class AuthCheckResponse {
     userId: TUserId
 
     roles: Roles[]
+}
+
+export class CourseAndStudentDTO {
+    userId: string
+
+    courseId: string
+}
+export type TAnswerFeedback = {
+    correctness: AnswerCorrectness;
+    feedback?: string;
+}
+export type TUpdateFeedbackDTO = {
+    teacherId: any;
+    studentId: any;
+    pageId: any;
+    feedback: Record<string, TAnswerFeedback>;
 }
 
 export class CourseCreateResponse {

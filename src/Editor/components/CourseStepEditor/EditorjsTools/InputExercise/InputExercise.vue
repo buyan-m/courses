@@ -28,6 +28,7 @@
             :class="$style.input"
             size="small"
             @keydown.delete.stop
+            @keydown.enter.stop.prevent
             @keyup.enter.stop.prevent="handleInputConfirm"
             @blur="handleInputConfirm"
         />

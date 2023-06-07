@@ -34,6 +34,11 @@ export default {
                     ]
                 }
             ]
+        },
+        {
+            path: 'students',
+            name: 'teacher-students',
+            component: () => import('@/Viewer/views/TeacherStudents.vue')
         }
     ]
 }

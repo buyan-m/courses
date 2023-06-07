@@ -14,7 +14,7 @@ import {
 } from 'vue'
 
 const props = defineProps<{ text: string }>()
-const emitter = defineEmits<{(e: 'change', value: string): void }>()
+const emitter = defineEmits<{ change:[value: string] }>()
 
 const element = ref<VueElement | null>(null)
 function updateValue() {

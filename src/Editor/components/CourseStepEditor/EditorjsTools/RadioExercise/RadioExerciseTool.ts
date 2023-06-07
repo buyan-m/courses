@@ -23,7 +23,7 @@ export default class RadioExerciseTool implements BaseTool {
     constructor({ data }: TRadioConstructorParams) {
         this.form = null
         this.vueComponent = null
-        this.options = data.options || [{ value: '' }]
+        this.options = data.options || [{ value: '', isCorrect: false }]
     }
 
     render() {
