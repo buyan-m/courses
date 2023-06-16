@@ -109,6 +109,60 @@ export class PageCreateDTO {
     structure: EditorPageStructure
 }
 
+export class ShareCodeDTO {
+    userId: TUserId
+
+    _id: string
+}
+export class ShareCode extends ShareCodeDTO {
+    validTill: number
+
+    status: ShareCodeStatus
+}
+export enum ShareCodeStatus {
+    'actual' = 'actual',
+    'outdated' = 'outdated'
+}
+
+export enum TeacherTypes {
+    active = 'active',
+    archive = 'archive'
+}
+
+export enum CourseRoles {
+    teacher = 'teacher',
+    student = 'student',
+    visitor = 'visitor',
+    owner = 'owner'
+}
+export class CourseAndStudentDTO {
+    userId: string
+
+    courseId: string
+}
+export class CourseAndShareCodeDTO {
+    shareCode: string
+
+    courseId: string
+}
+export type TAnswerFeedback = {
+    correctness: AnswerCorrectness;
+    feedback?: string;
+}
+export type TUpdateFeedbackDTO = {
+    teacherId: any;
+    studentId: any;
+    pageId: any;
+    feedback: Record<string, TAnswerFeedback>;
+}
+export class LearningPageDTO {
+    teacherId: TUserId
+
+    studentId: string
+
+    pageId: string
+}
+
 export type TCourseId = string
 export type TLessonId = string
 export type TPageId = string
@@ -150,9 +204,13 @@ export class ViewerLessonResponse extends LessonResponse {
     completed: boolean
 }
 export class ViewerCourseResponse extends CourseDTO {
+    _id: TCourseId
+
     lessons: ViewerLessonResponse[]
+
+    role: CourseRoles
 }
-export class CourseResponse extends CourseDTO {
+export class EditorCourseResponse extends CourseDTO {
     _id: TCourseId
 
     lessons: LessonResponse[]
@@ -225,6 +283,8 @@ export class Teacher {
     userId: TUserId
 
     courseId: TCourseId
+
+    type: TeacherTypes
 }
 export class Student {
     userId: TUserId
@@ -301,22 +361,6 @@ export class AuthCheckResponse {
     userId: TUserId
 
     roles: Roles[]
-}
-
-export class CourseAndStudentDTO {
-    userId: string
-
-    courseId: string
-}
-export type TAnswerFeedback = {
-    correctness: AnswerCorrectness;
-    feedback?: string;
-}
-export type TUpdateFeedbackDTO = {
-    teacherId: any;
-    studentId: any;
-    pageId: any;
-    feedback: Record<string, TAnswerFeedback>;
 }
 
 export class CourseCreateResponse {

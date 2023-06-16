@@ -11,11 +11,17 @@ export class ViewerCoursePage {
 
     readonly inviteFormInput: Locator
 
+    readonly removeCourseFromTeachingButton: Locator
+
+    readonly removeCourseConfirmButton: Locator
+
     constructor(page:Page) {
         this.page = page
         this.inviteForm = page.locator('[data-test="inviteForm"]')
         this.becomeTeacherButton = page.locator('[data-test="becomeTeacherButton"]')
         this.inviteFormSubmit = page.locator('[data-test="inviteForm.submit"]')
         this.inviteFormInput = page.locator('[data-test="inviteForm.input"]')
+        this.removeCourseFromTeachingButton = page.locator('[data-test="removeCourseButton"]')
+        this.removeCourseConfirmButton = page.locator('.removeCourseConfirmButton')
     }
 }

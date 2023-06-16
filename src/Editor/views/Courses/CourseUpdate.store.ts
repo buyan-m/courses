@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import type {
     CourseCreateResponse,
-    CourseResponse,
+    EditorCourseResponse,
     TCourseId,
     LessonResponse,
     TLessonId,
@@ -33,7 +33,7 @@ export const useCourseUpdateStore = defineStore('courseUpdate', {
             name: 'Course\'s title',
             description: 'Course\'s description',
             lessons: [getEmptyLesson()]
-        } as CourseResponse
+        } as EditorCourseResponse
     }),
 
     actions: {
@@ -41,7 +41,7 @@ export const useCourseUpdateStore = defineStore('courseUpdate', {
             if (courseId) {
                 this.courseId = courseId
 
-                return request<CourseResponse>(`/api/editor/courses/${this.courseId}`)
+                return request<EditorCourseResponse>(`/api/editor/courses/${this.courseId}`)
                     .then(({ data, errors }) => {
                         if (data) {
                             this.course = data
