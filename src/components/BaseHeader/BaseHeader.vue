@@ -37,12 +37,21 @@
         >
             {{ $t('logout') }}
         </el-menu-item>
+        <el-menu-item
+            index="6"
+            data-test="shareMenuOpener"
+            @click="getCode"
+        >
+            {{ $t('get-code') }}
+        </el-menu-item>
     </el-menu>
 </template>
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, h } from 'vue'
+import { ElMessageBox } from 'element-plus'
 import request from '@/utils/request'
 import OkulLogo from '@/components/OkulLogo/OkulLogo.vue'
+import ShareCode from '@/Basic/components/ShareCode/ShareCode.vue'
 
 export default defineComponent({
     components: { OkulLogo },
@@ -57,6 +66,15 @@ export default defineComponent({
             request('/api/logout').then(() => {
                 window.location.reload()
             })
+        },
+        getCode() {
+            ElMessageBox.alert(
+                h(ShareCode, {
+                    onSuccess: () => ElMessageBox.close()
+                }),
+                this.$t('get-code-title'),
+                { confirmButtonText: this.$t('close') }
+            )
         }
     }
 })
@@ -91,12 +109,18 @@ export default defineComponent({
     "en": {
         "courses": "Courses",
         "editor": "Editor",
-        "logout": "Logout"
+        "logout": "Logout",
+        "get-code": "A code for your teachers",
+        "close": "Close",
+        "get-code-title": "A code for your teachers"
     },
     "ru": {
         "courses": "Курсы",
         "editor": "Редактор",
-        "logout":  "Выход"
+        "logout": "Выход",
+        "get-code": "Код для твоего учителя",
+        "close": "Закрыть",
+        "get-code-title": "Код для твоего учителя"
     }
 }
 </i18n>

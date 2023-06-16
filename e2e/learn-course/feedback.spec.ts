@@ -5,6 +5,7 @@ import data from '../data.json'
 import { ViewerCoursePage } from '../pages/viewerCourse.page'
 import { ViewerStudentsPage } from '../pages/viewerStudents.page'
 import { ViewerLessonPage } from '../pages/viewerLesson.page'
+import { CommonPage } from '../pages/common.page'
 
 const studentWithCourse = {
     studentId: data.studentId,
@@ -22,6 +23,8 @@ const studentLessonTestPage = {
     pageId: data.testCourse.exercisesPageId
 }
 
+const courseViewerPage = routes.viewerCoursePage({ courseId: data.testCourse.id })
+
 const EXERCISES_ON_PAGE_COUNT = 4
 
 const feedbacks = [
@@ -31,20 +34,20 @@ const feedbacks = [
     { text: '', mark: 'pass' }
 ]
 
-test.describe.only('Learning', () => {
+test.describe('Learning', () => {
     test.describe('Basics', () => {
         test('View own course (editor)', async ({ page, context }) => {
             const coursePage = new ViewerCoursePage(page)
             await authorize(context, 'editor')
-            await page.goto(routes.viewerCoursePage({ courseId: data.testCourse.id }))
+            await page.goto(courseViewerPage)
 
             await expect(coursePage.inviteForm).toBeVisible()
         })
 
-        test.skip('View new course (teacher)', async ({ page, context }) => {
+        test('View new course (teacher)', async ({ page, context }) => {
             const coursePage = new ViewerCoursePage(page)
             await authorize(context, 'teacher')
-            await page.goto(routes.viewerCoursePage({ courseId: data.testCourse.id }))
+            await page.goto(courseViewerPage)
 
             await expect(await coursePage.inviteForm.count()).toEqual(0)
         })
@@ -53,7 +56,7 @@ test.describe.only('Learning', () => {
             const coursePage = new ViewerCoursePage(page)
             const lessonPage = new ViewerLessonPage(page)
             await authorize(context, 'teacher')
-            await page.goto(routes.viewerCoursePage({ courseId: data.testCourse.id }))
+            await page.goto(courseViewerPage)
             await coursePage.becomeTeacherButton.click()
 
             await expect(coursePage.inviteForm).toBeVisible()
@@ -65,6 +68,15 @@ test.describe.only('Learning', () => {
             const coursePage = new ViewerCoursePage(page)
             const studentsPage = new ViewerStudentsPage(page)
             const lessonPage = new ViewerLessonPage(page)
+            const commonPage = new CommonPage(page)
+
+            await authorize(context, 'student')
+
+            await page.goto(routes.viewerStudents)
+
+            const shareCode = await commonPage.getShareCode()
+
+            await expect(commonPage.shareCodeField).toHaveText(shareCode)
 
             await authorize(context, 'teacher')
 
@@ -73,8 +85,8 @@ test.describe.only('Learning', () => {
                 await studentsPage.getStudentForCourse(studentWithCourse).count()
             ).toEqual(0)
 
-            await page.goto(routes.viewerCoursePage({ courseId: data.testCourse.id }))
-            await coursePage.inviteFormInput.fill(data.studentId)
+            await page.goto(courseViewerPage)
+            await coursePage.inviteFormInput.fill(shareCode)
             await coursePage.inviteFormSubmit.click()
 
             await page.waitForLoadState('networkidle')
@@ -208,13 +220,18 @@ test.describe.only('Learning', () => {
         })
 
         test('The editor sees the student\'s answers after inviting them', async ({ context, page }) => {
-            await authorize(context, 'editor')
             const studentsPage = new ViewerStudentsPage(page)
             const coursePage = new ViewerCoursePage(page)
             const exercisesPage = new ViewerLessonPage(page)
+            const commonPage = new CommonPage(page)
 
-            await page.goto(routes.viewerCoursePage({ courseId: data.testCourse.id }))
-            await coursePage.inviteFormInput.fill(data.studentId)
+            await authorize(context, 'student')
+            await page.goto(routes.viewerStudents)
+            const shareCode = await commonPage.getShareCode()
+
+            await authorize(context, 'editor')
+            await page.goto(courseViewerPage)
+            await coursePage.inviteFormInput.fill(shareCode)
             await coursePage.inviteFormSubmit.click()
 
             await page.waitForLoadState('networkidle')
@@ -266,6 +283,17 @@ test.describe.only('Learning', () => {
             await page.waitForLoadState('networkidle')
             await page.goto(routes.viewerStudents)
             await expect(await studentsPage.getStudentForCourse(studentWithCourse).count()).toEqual(0)
+        })
+
+        test('The teacher remove a course', async ({ page, context }) => {
+            const coursePage = new ViewerCoursePage(page)
+            await authorize(context, 'teacher')
+            await page.goto(courseViewerPage)
+
+            await coursePage.removeCourseFromTeachingButton.click()
+            await coursePage.removeCourseConfirmButton.click()
+            await page.waitForLoadState('networkidle')
+            await expect(await coursePage.inviteForm.count()).toEqual(0)
         })
     })
 })
