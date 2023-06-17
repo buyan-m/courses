@@ -4,6 +4,8 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
+import 'element-plus/es/components/message/style/css'
+import 'element-plus/es/components/message-box/style/css'
 
 export default defineComponent({
     name: 'App'
