@@ -105,6 +105,7 @@ test.describe('Learning', () => {
             await page.goto(routes.viewerLessonPage(studentLessonPage))
             await exercisesPage.nextPageButton.click()
             await expect(await exercisesPage.feedbackBlock.count()).toEqual(0)
+            await expect.soft(exercisesPage.completeLessonButton).toBeDisabled()
 
             await exercisesPage.radioExercise
                 .nth(0)

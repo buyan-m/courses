@@ -34,7 +34,7 @@ import {
 import type { CheckAnswer, Option } from '@/types/api-types'
 import OriginalAnswers from '@/Viewer/PageBlocks/OriginalAnswers/OriginalAnswers.vue'
 import AnswerFeedback from '@/Viewer/PageBlocks/AnswerFeedback/AnswerFeedback.vue'
-import { TAnswerFeedback } from '@/types/api-types'
+import { AnswerCorrectness, AnswerTypes, TAnswerFeedback } from '@/types/api-types'
 
 const $styles = useCssModule()
 const props = defineProps<{
@@ -43,7 +43,7 @@ const props = defineProps<{
     isTeacher: boolean
 }>()
 const emit = defineEmits<{
-    answer: [text: string[]],
+    answer: [text: CheckAnswer],
     saveFeedback: [fb: TAnswerFeedback]
 }>()
 const innerOptions = ref(props.options.map((el) => ({
@@ -57,16 +57,22 @@ function saveFeedback(feedback: TAnswerFeedback) {
 }
 
 function checkAnswer() {
-    if (innerOptions.value.some((el) => !el.checked && el.isCorrect)) {
-        return
-    }
-    emit(
-        'answer',
-        innerOptions.value.reduce((acc, el) => {
-            if (el.checked) acc.push(el.value)
-            return acc
-        }, [] as string[])
-    )
+    let correctness = AnswerCorrectness.correct
+    let showCorrectness = false
+    const value = [] as string[]
+
+    innerOptions.value.forEach((el) => {
+        if (el.isCorrect && !showCorrectness) showCorrectness = true
+        if (el.checked) value.push(el.value)
+        if ((el.checked && !el.isCorrect) || (!el.checked && el.isCorrect)) correctness = AnswerCorrectness.incorrect
+    })
+
+    emit('answer', {
+        type: AnswerTypes.checkbox,
+        value,
+        correctness: showCorrectness ? correctness : AnswerCorrectness['not-verified'],
+        feedback: ''
+    })
 }
 
 function alreadyAnsweredCallback(alreadyAnsweredValue?: CheckAnswer) {

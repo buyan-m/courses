@@ -13,11 +13,11 @@ import { createYoutubeURL } from '@/utils/embeds'
 import type {
     TAnswer, AnswerWithId, PageViewerDTO as ViewerPageResponse, EditorBlockType, Option, TAnswerFeedback
 } from '@/types/api-types'
-import { AnswerCorrectness, AnswerTypes } from '@/types/api-types'
+import { AnswerTypes } from '@/types/api-types'
 
 type TConvertorInput = {
     data: unknown,
-    passHandler?: (answer: unknown) => void,
+    passHandler?: (answer: TAnswer) => void,
     feedbackHandler?: (feedback: TAnswerFeedback) => void,
     answer?: unknown
 }
@@ -32,13 +32,11 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-    answersReceived:[answers: AnswerWithId[]],
+    answerReceived:[answer: AnswerWithId],
     feedbackUpdated: [answer: AnswerWithId],
 }>()
 
 const convertedBlocks = ref([] as VNode[])
-const questions = ref([] as string[])
-const answers = ref([] as AnswerWithId[])
 
 const CONVERTERS = {
     paragraph({ data } : TConvertorInput & { data: { text: string } }) {
@@ -103,18 +101,9 @@ const CONVERTERS = {
     }
 } as Record<EditorBlockType, TConvertor>
 
-function answerHandler(blockId: string, blockType: AnswerTypes) {
-    questions.value.push(blockId)
-    return (answer: unknown) => {
-        questions.value = questions.value.filter((el) => el !== blockId)
-        answers.value.push({
-            id: blockId,
-            answer: {
-                type: blockType,
-                value: answer,
-                correctness: AnswerCorrectness['not-verified']
-            } as TAnswer
-        })
+function answerHandler(id: string) {
+    return (answer: TAnswer) => {
+        emit('answerReceived', { id, answer })
     }
 }
 
@@ -133,12 +122,12 @@ function getFeedbackHandler(blockId: string) {
 
 function convert(structure: ViewerPageResponse['structure']) {
     return structure.blocks.map((block) => {
-        if (Object.keys(AnswerTypes).indexOf(block.type) !== -1) {
+        if (Object.keys(AnswerTypes).includes(block.type)) {
             const answer = props.savedAnswers[block.id]
             return CONVERTERS[block.type](
                 {
                     data: block.data,
-                    passHandler: answerHandler(block.id, block.type as unknown as AnswerTypes),
+                    passHandler: answerHandler(block.id),
                     feedbackHandler: getFeedbackHandler(block.id),
                     answer
                 }
@@ -151,25 +140,11 @@ function convert(structure: ViewerPageResponse['structure']) {
 }
 
 watch(() => props.content, (newValue) => {
-    answers.value = []
     convertedBlocks.value = convert(newValue)
-    if (questions.value.length === 0) {
-        emit('answersReceived', [])
-    }
 })
 
 watch(() => props.savedAnswers, () => {
-    answers.value = []
     convertedBlocks.value = convert(props.content)
-    if (questions.value.length === 0) {
-        emit('answersReceived', [])
-    }
-})
-
-watch(() => questions.value, (newValue) => {
-    if (newValue.length === 0) {
-        emit('answersReceived', answers.value)
-    }
 })
 
 const page = () => h('article', { 'data-test': 'pageContent' }, convertedBlocks.value)
