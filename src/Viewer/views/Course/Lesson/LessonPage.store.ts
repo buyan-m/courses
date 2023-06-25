@@ -1,8 +1,14 @@
 import { defineStore } from 'pinia'
 import request, { TResponse } from '@/utils/request'
 import type {
-    NextPage, PageViewerDTO as ViewerPageResponse, AnswersDTO, AnswerFeedback, AnswerWithId, TAnswer
+    NextPage, PageViewerDTO as ViewerPageResponse, AnswersDTO, AnswerFeedback, AnswerWithId, TAnswer, TEditorBlock
 } from '@/types/api-types'
+import { AnswerTypes } from '@/types/api-types'
+
+function getQuestionIds(blocks: TEditorBlock[]): string[] {
+    return blocks.filter((block) => Object.keys(AnswerTypes).includes(block.type))
+        .map((block) => block.id)
+}
 
 export const useLessonPageStore = defineStore('lessonPage', {
     state: () => ({
@@ -13,6 +19,7 @@ export const useLessonPageStore = defineStore('lessonPage', {
         nextPage: false,
         pageCompleted: false,
         answers: [] as AnswerWithId[],
+        questionIds: [] as string[],
         saveRequest: Promise.resolve() as Promise<unknown>,
         savedAnswers: {} as Record<string, TAnswer>,
         updatedFeedbacks: {} as Record<string, AnswerFeedback>,
@@ -24,6 +31,7 @@ export const useLessonPageStore = defineStore('lessonPage', {
             this.currentStudentId = ''
             this.pageCompleted = false
             this.isUserTeacher = false
+            this.questionIds = []
             this.savedAnswers = {} as Record<string, TAnswer>
             this.answers = []
             let answersRequest: Promise<TResponse<AnswersDTO>> = new Promise(() => {})
@@ -77,8 +85,12 @@ export const useLessonPageStore = defineStore('lessonPage', {
                 }),
                 request<ViewerPageResponse>(`/api/viewer/pages/${pageId}`).then(({ data, errors }) => {
                     if (data) {
-                        this.pageContent = data!.structure
-                        this.heading = data!.name
+                        this.pageContent = data.structure
+                        this.heading = data.name
+                        this.questionIds = getQuestionIds(data.structure.blocks)
+                        if (!this.questionIds.length) {
+                            this.pageCompleted = true
+                        }
                         this.nextPage = data!.nextPageAvailable
                     } else {
                         throw new Error(errors[0])
@@ -143,9 +155,17 @@ export const useLessonPageStore = defineStore('lessonPage', {
                 })
         },
 
-        setAnswers(answers: AnswerWithId[]) {
-            this.answers = answers
-            this.pageCompleted = true
+        setAnswer(answer: AnswerWithId) {
+            const replaceableIndex = this.answers.findIndex(({ id }) => id === answer.id)
+            if (replaceableIndex > -1) {
+                this.answers[replaceableIndex] = answer
+            } else {
+                this.answers.push(answer)
+            }
+            this.questionIds = this.questionIds.filter((id) => id !== answer.id)
+            if (this.questionIds.length === 0) {
+                this.pageCompleted = true
+            }
         },
 
         resetAnswers() {

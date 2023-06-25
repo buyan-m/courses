@@ -36,7 +36,7 @@ import {
     defineEmits, defineProps, ref, useCssModule, watch
 } from 'vue'
 import type { Option, RadioAnswer } from '@/types/api-types'
-import { TAnswerFeedback } from '@/types/api-types'
+import { AnswerCorrectness, AnswerTypes, TAnswerFeedback } from '@/types/api-types'
 import OriginalAnswers from '@/Viewer/PageBlocks/OriginalAnswers/OriginalAnswers.vue'
 import AnswerFeedback from '@/Viewer/PageBlocks/AnswerFeedback/AnswerFeedback.vue'
 
@@ -47,7 +47,7 @@ const props = defineProps<{
     isTeacher: boolean
 }>()
 const emit = defineEmits<{
-    answer:[answer: string],
+    answer:[answer: RadioAnswer],
     saveFeedback: [fb: TAnswerFeedback]
 }>()
 
@@ -77,7 +77,22 @@ watch(() => props.answer, (answer) => {
 
 function checkAnswer() {
     answerChecked.value = true
-    emit('answer', props.options[checkedAnswerIndex.value].value)
+    let correctness = AnswerCorrectness['not-verified']
+
+    if (props.options.some(({ isCorrect }) => isCorrect)) {
+        correctness = AnswerCorrectness.incorrect
+    }
+
+    if (props.options[checkedAnswerIndex.value].isCorrect) {
+        correctness = AnswerCorrectness.correct
+    }
+
+    emit('answer', {
+        type: AnswerTypes.radio,
+        value: props.options[checkedAnswerIndex.value].value,
+        correctness,
+        feedback: ''
+    })
 }
 
 function getOptionStyles(index: number) {

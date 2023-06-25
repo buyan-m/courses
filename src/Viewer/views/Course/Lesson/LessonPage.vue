@@ -15,7 +15,7 @@
                 :content="$lessonStore.pageContent"
                 :saved-answers="$lessonStore.savedAnswers"
                 :is-teacher="$lessonStore.isUserTeacher"
-                @answers-received="answersReceived"
+                @answer-received="answerReceived"
                 @feedback-updated="updateFeedback"
             />
             <template v-if="!$lessonStore.isUserTeacher">
@@ -94,8 +94,8 @@ function updateContent() {
     })
 }
 
-function answersReceived(answers: AnswerWithId[]) {
-    $lessonStore.setAnswers(answers)
+function answerReceived(answer: AnswerWithId) {
+    $lessonStore.setAnswer(answer)
 }
 
 function sendFeedback() {

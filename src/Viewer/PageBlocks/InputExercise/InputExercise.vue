@@ -33,7 +33,7 @@
 import { defineProps, ref, watch } from 'vue'
 import { FormInstance } from 'element-plus'
 import type { TextAnswer } from '@/types/api-types'
-import { TAnswerFeedback } from '@/types/api-types'
+import { AnswerCorrectness, AnswerTypes, TAnswerFeedback } from '@/types/api-types'
 import AnswerFeedback from '@/Viewer/PageBlocks/AnswerFeedback/AnswerFeedback.vue'
 
 const props = defineProps<{
@@ -43,7 +43,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-    answer: [text: string],
+    answer: [text: TextAnswer],
     saveFeedback: [fb: TAnswerFeedback]
 }>()
 
@@ -57,7 +57,7 @@ function saveFeedback(feedback: TAnswerFeedback) {
 }
 
 function checkAnswer(value: string) {
-    if (props.answers.some((el) => el === value)) {
+    if (!props.answers.length || props.answers.some((el) => el === value)) {
         return true
     }
     return false
@@ -71,12 +71,16 @@ function alreadyAnsweredCallback(alreadyAnsweredValue?: TextAnswer) {
 }
 
 function submit() {
-    // обдумать как сделать вариант без проверки для отправки сразу
     const formInstance = form.value! as FormInstance
     formInstance.validate((valid) => {
         if (valid) {
-            emit('answer', innerAnswer.value.text)
-            inputDisabled.value = true
+            emit('answer', {
+                type: AnswerTypes.input,
+                value: innerAnswer.value.text,
+                correctness: props.answers.length ? AnswerCorrectness.correct : AnswerCorrectness['not-verified'],
+                feedback: ''
+            })
+            inputDisabled.value = !!props.answers.length
         }
     })
 }
