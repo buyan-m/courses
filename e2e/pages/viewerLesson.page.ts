@@ -1,6 +1,14 @@
 import type { Locator, Page } from '@playwright/test'
+import { expect } from '@playwright/test'
 
 const PAGE_CONTENT_SELECTOR = '[data-test="pageContent"]'
+
+const feedbacks = [
+    { text: 'well done', mark: 'pass' },
+    { text: 'good', mark: 'pass' },
+    { text: 'There is some error in your solution', mark: 'wrong' },
+    { text: '', mark: 'pass' }
+]
 
 export class ViewerLessonPage {
     readonly page: Page
@@ -60,5 +68,74 @@ export class ViewerLessonPage {
         this.sendFeedback = page.locator('[data-test="feedbackSend"]')
         this.resetTheAnswersButton = page.locator('[data-test="resetAnswers"]')
         this.editableFeedback = page.locator('[data-test="editableFeedback"]')
+    }
+
+    async fillTheExercises() {
+        await this.radioExercise
+            .nth(0)
+            .locator('label')
+            .nth(0)
+            .click()
+
+        // expect(this.radioExercise
+        await this.radioExercise
+            .nth(1)
+            .locator('label')
+            .nth(1)
+            .click()
+
+        await this.checkboxExercise
+            .locator('label')
+            .nth(1)
+            .click()
+
+        await this.checkboxExercise
+            .locator('label')
+            .nth(2)
+            .click()
+
+        await this.inputExercise
+            .locator('input')
+            .fill('qwer')
+
+        await this.inputExercise
+            .locator('input')
+            .press('Enter')
+
+        await this.inputExercise
+            .locator('input')
+            .fill('Answer')
+
+        await this.inputExercise
+            .locator('input')
+            .press('Enter')
+
+        await this.completeLessonButton.click()
+
+        await this.page.waitForLoadState('networkidle')
+    }
+
+    async fillFeedback() {
+        const count = await this.editableFeedback.count() // it is definitely the same as two lines upper
+
+        expect(feedbacks.length).toEqual(count)
+        for (let i = 0; i < count; i += 1) {
+            // It is necessary
+            // eslint-disable-next-line no-await-in-loop
+            await this.feedbackBlockInput.nth(i).fill(feedbacks[i].text)
+            if (feedbacks[i].mark === 'pass') {
+                // eslint-disable-next-line no-await-in-loop
+                await this.feedbackBlockPass.nth(i).click()
+            } else if (feedbacks[i].mark === 'wrong') {
+                // eslint-disable-next-line no-await-in-loop
+                await this.feedbackBlockWrong.nth(i).click()
+            }
+            // eslint-disable-next-line no-await-in-loop
+            await this.feedbackBlockSave.nth(i).click()
+        }
+
+        await this.sendFeedback.click()
+        await this.page.waitForTimeout(200)
+        await this.page.waitForLoadState('networkidle')
     }
 }

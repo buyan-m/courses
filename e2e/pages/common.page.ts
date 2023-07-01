@@ -11,12 +11,24 @@ export class CommonPage {
 
     readonly shareCodeField: Locator
 
+    readonly notificationsBlock: Locator
+
+    readonly notificationsOpener: Locator
+
+    readonly notificationTimes: Locator
+
+    readonly notifications: Locator
+
     constructor(page: Page) {
         this.page = page
-        this.submenuItem = page.locator('.el-sub-menu__hide-arrow')
+        this.submenuItem = page.locator('[data-test="subMenuOpener"]')
         this.shareCodeOpener = page.locator('[data-test="shareMenuOpener"]')
         this.shareCodePopup = page.locator('[data-test="shareMenuPopup"]')
         this.shareCodeField = page.locator('[data-test="shareMenuField"]')
+        this.notificationsBlock = page.locator('[data-test="notificationsBlock"]')
+        this.notificationsOpener = page.locator('[data-test="notificationsOpener"]')
+        this.notifications = page.locator('[data-test="notification"]')
+        this.notificationTimes = page.locator('[data-test="notification"] time')
     }
 
     async getShareCode(): Promise<string> {
