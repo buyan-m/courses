@@ -122,7 +122,7 @@ function getFeedbackHandler(blockId: string) {
 
 function convert(structure: ViewerPageResponse['structure']) {
     return structure.blocks.map((block) => {
-        if (Object.keys(AnswerTypes).includes(block.type)) {
+        if (block.type in AnswerTypes) {
             const answer = props.savedAnswers[block.id]
             return CONVERTERS[block.type](
                 {

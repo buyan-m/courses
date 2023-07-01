@@ -27,13 +27,6 @@ const courseViewerPage = routes.viewerCoursePage({ courseId: data.testCourse.id 
 
 const EXERCISES_ON_PAGE_COUNT = 4
 
-const feedbacks = [
-    { text: 'well done', mark: 'pass' },
-    { text: 'good', mark: 'pass' },
-    { text: 'There is some error in your solution', mark: 'wrong' },
-    { text: '', mark: 'pass' }
-]
-
 test.describe('Learning', () => {
     test.describe('Basics', () => {
         test('View own course (editor)', async ({ page, context }) => {
@@ -107,50 +100,7 @@ test.describe('Learning', () => {
             await expect(await exercisesPage.feedbackBlock.count()).toEqual(0)
             await expect.soft(exercisesPage.completeLessonButton).toBeDisabled()
 
-            await exercisesPage.radioExercise
-                .nth(0)
-                .locator('label')
-                .nth(0)
-                .click()
-
-            // expect(exercisesPage.radioExercise
-            await exercisesPage.radioExercise
-                .nth(1)
-                .locator('label')
-                .nth(1)
-                .click()
-
-            await exercisesPage.checkboxExercise
-                .locator('label')
-                .nth(1)
-                .click()
-
-            await exercisesPage.checkboxExercise
-                .locator('label')
-                .nth(2)
-                .click()
-
-            await exercisesPage.inputExercise
-                .locator('input')
-                .fill('qwer')
-
-            await exercisesPage.inputExercise
-                .locator('input')
-                .press('Enter')
-
-            await exercisesPage.inputExercise
-                .locator('input')
-                .fill('Answer')
-
-            await exercisesPage.inputExercise
-                .locator('input')
-                .press('Enter')
-
-            await expect(await exercisesPage.feedbackBlock.count()).toEqual(0)
-
-            await exercisesPage.completeLessonButton.click()
-
-            await page.waitForLoadState('networkidle')
+            await exercisesPage.fillTheExercises()
 
             await page.reload()
 
@@ -166,28 +116,7 @@ test.describe('Learning', () => {
             await expect(await exercisesPage.editableFeedback.count()).toEqual(EXERCISES_ON_PAGE_COUNT)
             await expect(exercisesPage.content).toHaveScreenshot()
 
-            const count = await exercisesPage.editableFeedback.count() // it is definitely the same as two lines upper
-
-            expect(feedbacks.length).toEqual(count)
-
-            for (let i = 0; i < count; i += 1) {
-                // It is necessary
-                // eslint-disable-next-line no-await-in-loop
-                await exercisesPage.feedbackBlockInput.nth(i).fill(feedbacks[i].text)
-                if (feedbacks[i].mark === 'pass') {
-                    // eslint-disable-next-line no-await-in-loop
-                    await exercisesPage.feedbackBlockPass.nth(i).click()
-                } else if (feedbacks[i].mark === 'wrong') {
-                    // eslint-disable-next-line no-await-in-loop
-                    await exercisesPage.feedbackBlockWrong.nth(i).click()
-                }
-                // eslint-disable-next-line no-await-in-loop
-                await exercisesPage.feedbackBlockSave.nth(i).click()
-            }
-
-            await exercisesPage.sendFeedback.click()
-            await page.waitForTimeout(200)
-            await page.waitForLoadState('networkidle')
+            await exercisesPage.fillFeedback()
 
             await page.goto(routes.viewerLessonStudentPage(studentLessonTestPage))
             await page.reload()

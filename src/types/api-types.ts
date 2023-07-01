@@ -150,13 +150,13 @@ export type TAnswerFeedback = {
     feedback?: string;
 }
 export type TUpdateFeedbackDTO = {
-    teacherId: any;
-    studentId: any;
-    pageId: any;
+    teacherId: string;
+    studentId: string;
+    pageId: string;
     feedback: Record<string, TAnswerFeedback>;
 }
 export class LearningPageDTO {
-    teacherId: TUserId
+    teacherId: string
 
     studentId: string
 
@@ -180,6 +180,8 @@ export class Grant {
     objectType: GrantObjectType
 }
 export class User {
+    _id: TUserId
+
     name: string
 }
 class OmittedPage {
@@ -231,6 +233,8 @@ class PageStructure {
     blocks: TEditorBlock[]
 }
 export class Page {
+    _id: TPageId
+
     structure: PageStructure
 
     name: string
@@ -263,7 +267,7 @@ export class Token {
 
     userId: TUserId
 
-    validTill: Date
+    validTill: string
 }
 export class Progress {
     userId: TUserId
@@ -340,9 +344,104 @@ export class AnswersDTO {
     answers: AnswerWithId[]
 }
 export class PageAnswers extends AnswersDTO {
-    studentId: TUserId
+    studentId: string
 
-    pageId: TPageId
+    pageId: string
+}
+export class PaginationInfo {
+    totalCount: number
+}
+
+            type TSimplifiedCourse = Pick<ViewerCourseResponse, 'name' | '_id'>
+export enum NotificationStates {
+    new = 'new',
+    viewed = 'viewed'
+}
+export enum NotificationTypes {
+    courseInvitation = 'courseInvitation',
+    pagePass = 'pagePass',
+    feedbackReceived = 'feedbackReceived'
+}
+export type TNotificationId = string
+export class AbstractProductNotification {
+    _id: TNotificationId
+
+    status: NotificationStates
+
+    user: User
+
+    cdate: string
+}
+export class CourseInvitationNotification extends AbstractProductNotification {
+    type: NotificationTypes.courseInvitation
+
+    details: {
+        course: TSimplifiedCourse;
+        inviter: User;
+    }
+}
+export class PagePassNotification extends AbstractProductNotification {
+    type: NotificationTypes.pagePass
+
+    details: {
+        course: TSimplifiedCourse;
+        lesson: LessonUpdateDTO;
+        student: User;
+        page: Pick<Page, 'name' | '_id'>;
+    }
+}
+export class FeedbackReceivedNotification extends AbstractProductNotification {
+    type: NotificationTypes.feedbackReceived
+
+    details: {
+        course: TSimplifiedCourse;
+        lesson: LessonUpdateDTO;
+        teacher: User;
+        page: Pick<Page, 'name' | '_id'>;
+    }
+}
+export type TGetNotificationsFilter = {
+    userId: TUserId;
+}
+class AbstractCreateNotificationDTO {
+    userId: string
+}
+export class CourseInvitationNotificationCreateDTO extends AbstractCreateNotificationDTO {
+    type: NotificationTypes
+
+    details: {
+        courseId: string;
+        inviterId: string;
+    }
+}
+export class PagePassNotificationCreateDTO extends AbstractCreateNotificationDTO {
+    type: NotificationTypes
+
+    details: {
+        courseId: string;
+        lessonId: string;
+        studentId: string;
+        pageId: string;
+    }
+}
+export class FeedbackReceivedNotificationCreateDTO extends AbstractCreateNotificationDTO {
+    type: NotificationTypes
+
+    details: {
+        courseId: string;
+        lessonId: string;
+        teacherId: string;
+        pageId: string;
+    }
+}
+export type TCreateNotificationDTO = CourseInvitationNotificationCreateDTO | PagePassNotificationCreateDTO | FeedbackReceivedNotificationCreateDTO
+export type TNotification = CourseInvitationNotification | PagePassNotification | FeedbackReceivedNotification
+export class NotificationsResponse {
+    notifications: TNotification[]
+
+    pageInfo: PaginationInfo & {
+        unreadCount: number;
+    }
 }
 
 export class AuthDto {

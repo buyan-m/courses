@@ -2,6 +2,7 @@
     <el-menu
         :class="$style.menu"
         mode="horizontal"
+        :ellipsis="false"
     >
         <el-menu-item index="1">
             <router-link :to="{name: 'main'}">
@@ -31,19 +32,50 @@
         >
             {{ warning }}
         </div>
-        <el-menu-item
-            index="5"
-            @click="logout"
+        <el-sub-menu index="5">
+            <template #title>
+                <el-icon
+                    data-test="notificationsOpener"
+                    :class="$style.icon"
+                >
+                    <el-badge
+                        :value="notificationsCount"
+                        :hidden="!notificationsCount"
+                        class="item"
+                    >
+                        <Bell />
+                    </el-badge>
+                </el-icon>
+            </template>
+
+            <ProductNotifications
+                @notification-count-updated="notificationCountUpdated"
+            />
+        </el-sub-menu>
+        <el-sub-menu
+            index="7"
+            :class="$style.notifications"
         >
-            {{ $t('logout') }}
-        </el-menu-item>
-        <el-menu-item
-            index="6"
-            data-test="shareMenuOpener"
-            @click="getCode"
-        >
-            {{ $t('get-code') }}
-        </el-menu-item>
+            <template #title>
+                <el-icon data-test="subMenuOpener">
+                    <Burger />
+                </el-icon>
+            </template>
+
+            <el-menu-item
+                index="8"
+                data-test="shareMenuOpener"
+                @click="getCode"
+            >
+                {{ $t('get-code') }}
+            </el-menu-item>
+            <el-menu-item
+                index="9"
+                @click="logout"
+            >
+                {{ $t('logout') }}
+            </el-menu-item>
+        </el-sub-menu>
     </el-menu>
 </template>
 <script lang="ts">
@@ -51,14 +83,23 @@ import { defineComponent, h } from 'vue'
 import { ElMessageBox } from 'element-plus'
 import request from '@/utils/request'
 import OkulLogo from '@/components/OkulLogo/OkulLogo.vue'
-import ShareCode from '@/Basic/components/ShareCode/ShareCode.vue'
+import ShareCode from '@/components/ShareCode/ShareCode.vue'
+import ProductNotifications from '@/components/ProductNotifications/ProductNotifications.vue'
+import { Bell, Burger } from '@element-plus/icons-vue'
 
 export default defineComponent({
-    components: { OkulLogo },
+    components: {
+        Bell, Burger, OkulLogo, ProductNotifications
+    },
     props: {
         warning: {
             type: String,
             default: ''
+        }
+    },
+    data() {
+        return {
+            notificationsCount: 0
         }
     },
     methods: {
@@ -75,6 +116,9 @@ export default defineComponent({
                 this.$t('get-code-title'),
                 { confirmButtonText: this.$t('close') }
             )
+        },
+        notificationCountUpdated(count: number) {
+            this.notificationsCount = count
         }
     }
 })
@@ -102,6 +146,14 @@ export default defineComponent({
     align-items: center;
     background-color: var(--el-color-warning-light-7);
     white-space: pre-line;
+}
+.notifications {
+    padding: 0;
+}
+
+.icon {
+    position: relative;
+    font-style: normal;
 }
 </style>
 <i18n>
