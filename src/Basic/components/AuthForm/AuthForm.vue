@@ -7,7 +7,7 @@
         hide-required-asterisk
     >
         <h3 :class="$style.heading">
-            Auth
+            {{ $t('auth') }}
         </h3>
         <el-form-item
             label="Email"
@@ -34,6 +34,17 @@
                 @keydown.enter="auth"
             />
         </el-form-item>
+        <div>
+            {{ $t('new-here') }}
+            <el-button
+                data-test="auth.switchToRegister"
+                link
+                type="primary"
+                @click="changeMode()"
+            >
+                {{ $t('register') }}
+            </el-button>
+        </div>
         <div :class="$style.footer">
             <span
                 v-if="errors.length && formUntouched"
@@ -43,18 +54,13 @@
                 {{ errors[0] }}
             </span>
             <el-button
-                v-else
+                :disabled="errors.length && formUntouched"
+                :class="$style.logInButton"
                 type="primary"
                 data-test="auth.login"
                 @click="auth"
             >
-                Log in
-            </el-button>
-            <el-button
-                data-test="auth.switchToRegister"
-                @click="changeMode(register)"
-            >
-                Register
+                {{ $t('log-in') }}
             </el-button>
         </div>
     </el-form>
@@ -67,7 +73,7 @@ import authValidationRules from '@/constants/AuthValidationRules'
 export default defineComponent({
     props: {
         errors: {
-            type: Object,
+            type: Array,
             default: () => [] as string[]
         }
     },
@@ -124,18 +130,34 @@ export default defineComponent({
     padding: 20px;
 }
 .footer {
-    display: flex;
+    display: grid;
     justify-content: space-between;
 }
 .formError {
     color: var(--el-color-danger);
     font-size: 12px;
     line-height: 1;
-    padding-bottom: 10px;
     display: block;
-    height: 22px;
+    justify-self: start;
+    grid-column: 1;
+    align-self: center;
 }
 .heading {
     padding-bottom: 10px;
 }
+
+.logInButton {
+    justify-self: end;
+    grid-column: 2;
+}
 </style>
+<i18n>
+{
+    "en": {
+        "register": "Register",
+        "log-in": "Log in",
+        "auth": "Auth",
+        "new-here": "Are you new here?"
+    }
+}
+</i18n>
