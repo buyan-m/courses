@@ -19,6 +19,21 @@ export default {
                     component: () => import('@/Viewer/views/Course/CourseMain.vue')
                 },
                 {
+                    path: 'students',
+                    children: [
+                        {
+                            path: '',
+                            component: () => import('@/Viewer/views/Course/Students/CourseStudents.vue'),
+                            name: 'viewer-course-students'
+                        },
+                        {
+                            path: ':studentId',
+                            component: () => import('@/Viewer/views/Course/Students/CourseStudent.vue'),
+                            name: 'viewer-course-student'
+                        }
+                    ]
+                },
+                {
                     path: 'lesson/:lessonId',
                     children: [
                         {

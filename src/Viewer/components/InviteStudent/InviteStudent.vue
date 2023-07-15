@@ -10,7 +10,7 @@
             <template #append>
                 <el-button
                     data-test="inviteForm.submit"
-                    @click="$emit('sendInvite', studentCode)"
+                    @click="sendInvite"
                 >
                     📧
                 </el-button>
@@ -22,10 +22,23 @@
 import { defineComponent } from 'vue'
 
 export default defineComponent({
-    emits: ['sendInvite'],
+    props: {
+        onSendInvite: {
+            type: Function,
+            required: true
+        }
+    },
     data: () => ({
         studentCode: ''
-    })
+    }),
+    methods: {
+        sendInvite() {
+            this.onSendInvite(this.studentCode)
+                .then((result: boolean) => {
+                    if (result) this.studentCode = ''
+                })
+        }
+    }
 })
 </script>
 <style module>

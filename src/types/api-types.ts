@@ -97,6 +97,8 @@ export class EditorPageBlock {
     data: TEditorBlock['data']
 }
 class EditorPageStructure {
+    time: number
+
     version: string
 
     blocks: EditorPageBlock[]
@@ -107,21 +109,11 @@ export class PageCreateDTO {
     lessonId: TLessonId
 
     structure: EditorPageStructure
-}
 
-export class ShareCodeDTO {
-    userId: TUserId
-
-    _id: string
+    isAnswersVisible: boolean
 }
-export class ShareCode extends ShareCodeDTO {
-    validTill: number
-
-    status: ShareCodeStatus
-}
-export enum ShareCodeStatus {
-    'actual' = 'actual',
-    'outdated' = 'outdated'
+export class PageUpdateDTO extends PageCreateDTO {
+    position: number
 }
 
 export enum TeacherTypes {
@@ -134,6 +126,13 @@ export enum CourseRoles {
     student = 'student',
     visitor = 'visitor',
     owner = 'owner'
+}
+export type TCourseStudentsResponse = TCourseStudentsResponseItem[]
+export type TCourseStudentsResponseItem = {
+    name: string;
+    userId: TUserId;
+    courseId: TCourseId;
+    courseTitle: string;
 }
 export class CourseAndStudentDTO {
     userId: string
@@ -161,6 +160,39 @@ export class LearningPageDTO {
     studentId: string
 
     pageId: string
+}
+export class LearningCourseDTO {
+    teacherId: string
+
+    studentId: string
+
+    courseId: string
+}
+export type TGetTeacherStudentsInput = {
+    teacherId: TUserId;
+    courseId?: string;
+}
+export type TGetStudentDetailsInput = {
+    teacherId: TUserId;
+    courseId: string;
+    studentId: string;
+    onlyUnchecked?: boolean;
+}
+export class DetailedStudentCourseInfo {
+    answerPages: Pick<PageAnswers, '_id' | 'checked'>[]
+
+    student: User
+
+    progress: {
+        lessons: {
+            _id: TLessonId;
+            pages: {
+                _id: TPageId;
+            }[];
+            name: string;
+        }[];
+        progress: Progress[];
+    }
 }
 
 export type TCourseId = string
@@ -221,11 +253,13 @@ export class CourseUpdateDTO extends CourseDTO {
     _id: TCourseId
 }
 export class EditorBlock {
+    id: string
+
     type: string
 
     data: unknown
 }
-class PageStructure {
+export class PageStructure {
     version: string
 
     time: number
@@ -244,6 +278,8 @@ export class Page {
     lessonId: TLessonId
 
     position: number
+
+    requireManualChecking: boolean
 }
 export class PageViewerDTO extends Page {
     nextPageAvailable: boolean
@@ -344,9 +380,13 @@ export class AnswersDTO {
     answers: AnswerWithId[]
 }
 export class PageAnswers extends AnswersDTO {
+    _id: string
+
     studentId: string
 
     pageId: string
+
+    checked: boolean
 }
 export class PaginationInfo {
     totalCount: number
@@ -460,6 +500,21 @@ export class AuthCheckResponse {
     userId: TUserId
 
     roles: Roles[]
+}
+
+export class ShareCodeDTO {
+    userId: TUserId
+
+    _id: string
+}
+export class ShareCode extends ShareCodeDTO {
+    validTill: number
+
+    status: ShareCodeStatus
+}
+export enum ShareCodeStatus {
+    'actual' = 'actual',
+    'outdated' = 'outdated'
 }
 
 export class CourseCreateResponse {
