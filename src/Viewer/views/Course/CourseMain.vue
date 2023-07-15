@@ -17,8 +17,18 @@
             <template v-if="isUserTeacherOfTheCourse">
                 {{ $t('teaching') }}
                 <div :class="$style.inviteAndArchive">
+                    <RouterLink
+                        :to="{
+                            name: 'viewer-course-students',
+                            params: {
+                                courseId: $route.params.courseId
+                            }
+                        }"
+                    >
+                        {{ $t('your-students') }}
+                    </RouterLink>
                     <InviteStudent
-                        @send-invite="sendInvite"
+                        :on-send-invite="sendInvite"
                     />
                     <el-button
                         v-if="isArchivingAvailable"
@@ -46,7 +56,7 @@ import SingleColumnLayout from '@/layouts/columns/SingleColumnLayout.vue'
 import { PageStatus } from '@/constants/PageStatus'
 import { defineComponent } from 'vue'
 import request from '@/utils/request'
-import type { ViewerCourseResponse } from '@/types/api-types'
+import type { User, ViewerCourseResponse } from '@/types/api-types'
 import { CourseRoles } from '@/types/api-types'
 import LessonCard from '@/Viewer/components/LessonCard/LessonCard.vue'
 import InviteStudent from '@/Viewer/components/InviteStudent/InviteStudent.vue'
@@ -120,7 +130,7 @@ export default defineComponent({
         },
 
         sendInvite(code: string) {
-            request('/api/learning/invite', {
+            return request<User>('/api/learning/invite', {
                 method: 'post',
                 body: JSON.stringify({
                     shareCode: code,
@@ -132,7 +142,16 @@ export default defineComponent({
                         message: errors[0],
                         type: 'error'
                     })
+                    return false
                 }
+                if (data) {
+                    ElMessage({
+                        message: `${data.name} ${this.$t('invited')}`,
+                        type: 'success'
+                    })
+                    return true
+                }
+                return false
             })
         },
 
@@ -197,7 +216,9 @@ export default defineComponent({
         "course-archiving-confirmation": "Do you want to stop teaching with this course?",
         "archive": "Archive",
         "cancel": "Cancel",
-        "remove-course": "Archive course"
+        "remove-course": "Archive course",
+        "invited": "is invited to the course",
+        "your-students": "The list of the course's students"
     }
 }
 </i18n>
