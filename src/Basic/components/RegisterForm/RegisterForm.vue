@@ -44,6 +44,17 @@
                 @keydown.enter="register"
             />
         </el-form-item>
+        <div>
+            {{ $t('already') }}
+            <el-button
+                data-test="auth.switchToAuth"
+                link
+                type="primary"
+                @click="changeMode"
+            >
+                {{ $t('log-in' ) }}
+            </el-button>
+        </div>
         <div :class="$style.footer">
             <span
                 v-if="errors.length && formUntouched"
@@ -53,21 +64,14 @@
                 {{ errors[0] }}
             </span>
             <el-button
-                v-else
+                :disabled="errors.length && formUntouched"
+                :class="$style.register"
                 type="primary"
                 data-test="auth.register"
                 @click="register"
             >
-                Register
+                {{ $t('register') }}
             </el-button>
-            <span>
-                <el-button
-                    data-test="auth.switchToAuth"
-                    @click="changeMode"
-                >
-                    Log in
-                </el-button>
-            </span>
         </div>
     </el-form>
 </template>
@@ -80,7 +84,7 @@ export default defineComponent({
 
     props: {
         errors: {
-            type: Object,
+            type: Array,
             default: () => [] as string[]
         }
     },
@@ -141,18 +145,30 @@ export default defineComponent({
     padding: 20px;
 }
 .footer {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
 }
 .formError {
     color: var(--el-color-danger);
     font-size: 12px;
     line-height: 1;
-    padding-bottom: 10px;
     display: block;
-    height: 22px;
+    grid-column: 1;
 }
 .heading {
     padding-bottom: 10px;
 }
+
+.register {
+    grid-column: 2;
+    justify-self: end;
+}
 </style>
+<i18n>
+{
+    "en": {
+        "log-in": "Log in",
+        "register": "Register",
+        "already": "Already registered?"
+    }
+}
+</i18n>
