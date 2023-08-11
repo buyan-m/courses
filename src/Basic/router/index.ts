@@ -10,6 +10,11 @@ export default {
             path: 'auth',
             name: 'auth',
             component: () => import('@/Basic/views/AuthView.vue')
+        },
+        {
+            path: 'confirm-email',
+            name: 'confirm-email',
+            component: () => import('@/Basic/views/ConfirmEmail.vue')
         }
     ]
 }
