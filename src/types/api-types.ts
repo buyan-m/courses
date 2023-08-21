@@ -391,6 +391,17 @@ export class PageAnswers extends AnswersDTO {
 export class PaginationInfo {
     totalCount: number
 }
+export class EmailConfirmation {
+    email: string
+
+    code: string
+
+    validTill: string
+}
+export type TPaginated<T> = {
+    items: T[];
+    count: number;
+}
 
             type TSimplifiedCourse = Pick<ViewerCourseResponse, 'name' | '_id'>
 export enum NotificationStates {
@@ -501,6 +512,63 @@ export class AuthCheckResponse {
 
     roles: Roles[]
 }
+export class ConfirmEmailDTO {
+    email: string
+
+    code: string
+}
+export class RequestConfirmEmailDTO {
+    email: string
+}
+export class UserInfo {
+    email: string
+
+    name: string
+
+    roles: Roles[]
+}
+
+export class IssueModelClass {
+    _id: string
+
+    user: TUserId
+
+    writtenEmail: string
+
+    gotEmail: string
+
+    issueText: string
+
+    url: string
+
+    cdate: string
+
+    checked: boolean
+
+    emailIsCorrect: boolean
+}
+export class IssueReport {
+    email: string
+
+    actualEmail: string
+
+    report: string
+
+    url: string
+}
+export class IssueReportDTO extends IssueReport {
+    userId: string
+}
+
+export type TGetIssuesParams = {
+    offset?: number;
+}
+export type AdminIssuesResponse = TPaginated<IssueModelClass & {
+    user: {
+        name: string;
+        _id: string;
+    };
+}>
 
 export class ShareCodeDTO {
     userId: TUserId
