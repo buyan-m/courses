@@ -1,14 +1,19 @@
 <template>
     <router-view />
+    <BugReport />
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue'
 import 'element-plus/es/components/message/style/css'
 import 'element-plus/es/components/message-box/style/css'
+import BugReport from '@/components/BugReport/BugReport.vue'
 
 export default defineComponent({
-    name: 'App'
+    name: 'App',
+    components: {
+        BugReport
+    }
 })
 </script>
 <style>
