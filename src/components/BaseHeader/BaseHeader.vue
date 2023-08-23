@@ -7,6 +7,7 @@
         <el-menu-item index="1">
             <router-link :to="{name: 'main'}">
                 <OkulLogo :class="$style.logo" />
+                <SimplifiedLogo :class="$style.smallLogo" />
             </router-link>
         </el-menu-item>
         <el-menu-item
@@ -32,7 +33,10 @@
         >
             {{ warning }}
         </div>
-        <el-sub-menu index="5">
+        <el-sub-menu
+            index="5"
+            :class="$style.submenu"
+        >
             <template #title>
                 <el-icon
                     data-test="notificationsOpener"
@@ -54,11 +58,11 @@
         </el-sub-menu>
         <el-sub-menu
             index="7"
-            :class="$style.notifications"
+            :class="$style.submenu"
         >
             <template #title>
                 <el-icon data-test="subMenuOpener">
-                    <Burger />
+                    <Menu />
                 </el-icon>
             </template>
 
@@ -83,13 +87,15 @@ import { defineComponent, h } from 'vue'
 import { ElMessageBox } from 'element-plus'
 import request from '@/utils/request'
 import OkulLogo from '@/components/OkulLogo/OkulLogo.vue'
+import SimplifiedLogo from '@/components/SimplifiedLogo/SimplifiedLogo.vue'
 import ShareCode from '@/components/ShareCode/ShareCode.vue'
 import ProductNotifications from '@/components/ProductNotifications/ProductNotifications.vue'
-import { Bell, Burger } from '@element-plus/icons-vue'
+import { Bell, Menu } from '@element-plus/icons-vue'
 
 export default defineComponent({
     components: {
-        Bell, Burger, OkulLogo, ProductNotifications
+        // eslint-disable-next-line vue/no-reserved-component-names
+        Bell, OkulLogo, SimplifiedLogo, Menu, ProductNotifications
     },
     props: {
         warning: {
@@ -136,6 +142,33 @@ export default defineComponent({
     height: auto;
     vertical-align: middle;
 }
+
+.smallLogo {
+    fill: var(--el-text-color-primary);
+    width: 35px;
+    height: auto;
+    vertical-align: middle;
+}
+
+@media screen and (max-width: 420px) {
+    .logo {
+        display: none;
+    }
+    .item {
+        font-size: 18px;
+        padding: 0 10px;
+    }
+    .menu {
+        height: 46px;
+    }
+}
+
+@media screen and (min-width: 421px) {
+    .smallLogo {
+        display: none;
+    }
+}
+
 .item {
     font-size: 20px
 }
@@ -147,8 +180,16 @@ export default defineComponent({
     background-color: var(--el-color-warning-light-7);
     white-space: pre-line;
 }
-.notifications {
+.submenu {
     padding: 0;
+}
+
+.submenu>div{
+    padding: 0
+}
+
+.submenu>div>i:last-child{
+    display: none;
 }
 
 .icon {
