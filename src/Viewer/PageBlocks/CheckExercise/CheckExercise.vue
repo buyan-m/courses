@@ -5,7 +5,7 @@
         <el-form-item
             v-for="(option, index) in innerOptions"
             :key="index"
-            :class="getOptionStyles(option)"
+            :class="getOptionStyles(index)"
         >
             <el-checkbox
                 v-model="option.checked"
@@ -18,6 +18,7 @@
         <AnswerFeedback
             v-if="answer"
             :answer="answer"
+            :auto-correctness="autoCorrectness"
             :is-editable="isTeacher"
             @save-feedback="saveFeedback"
         />
@@ -51,6 +52,14 @@ const innerOptions = ref(props.options.map((el) => ({
     ...el
 })))
 const originalAnswers = ref([] as string[])
+const answersCheckedMap = ref<Record<string | number, AnswerCorrectness>>({})
+const autoCorrectness = ref<AnswerCorrectness>(AnswerCorrectness['not-verified'])
+
+const stylesMap: Record<AnswerCorrectness, string> = {
+    [AnswerCorrectness.correct]: $styles.correctRow,
+    [AnswerCorrectness.incorrect]: $styles.wrongRow,
+    [AnswerCorrectness['not-verified']]: ''
+}
 
 function saveFeedback(feedback: TAnswerFeedback) {
     emit('saveFeedback', feedback)
@@ -58,13 +67,21 @@ function saveFeedback(feedback: TAnswerFeedback) {
 
 function checkAnswer() {
     let correctness = AnswerCorrectness.correct
-    let showCorrectness = false
+    const showCorrectness = innerOptions.value.some((el) => el.isCorrect)
     const value = [] as string[]
 
-    innerOptions.value.forEach((el) => {
-        if (el.isCorrect && !showCorrectness) showCorrectness = true
+    innerOptions.value.forEach((el, index) => {
         if (el.checked) value.push(el.value)
+
         if ((el.checked && !el.isCorrect) || (!el.checked && el.isCorrect)) correctness = AnswerCorrectness.incorrect
+
+        if (!el.checked) return
+
+        if (showCorrectness) {
+            answersCheckedMap.value[index] = el.isCorrect ? AnswerCorrectness.correct : AnswerCorrectness.incorrect
+        } else {
+            answersCheckedMap.value[index] = AnswerCorrectness['not-verified']
+        }
     })
 
     emit('answer', {
@@ -77,21 +94,36 @@ function checkAnswer() {
 
 function alreadyAnsweredCallback(alreadyAnsweredValue?: CheckAnswer) {
     if (alreadyAnsweredValue) {
+        let answersCorrectness = AnswerCorrectness['not-verified']
+        if (innerOptions.value.some(({ isCorrect }) => isCorrect)) {
+            answersCorrectness = AnswerCorrectness.incorrect
+        }
+
         alreadyAnsweredValue.value.forEach((el) => {
-            const element = innerOptions.value.find(({ value }) => value === el)
+            const index = innerOptions.value.findIndex(({ value }) => value === el)
+            const element = innerOptions.value[index]
             if (element) {
                 element.checked = true
+
+                if (element.isCorrect) {
+                    answersCheckedMap.value[index] = AnswerCorrectness.correct
+                } else {
+                    answersCheckedMap.value[index] = answersCorrectness
+                }
             } else {
                 originalAnswers.value.push(el)
             }
         })
-        // formDisabled.value = true
+
+        if (Object.values(answersCheckedMap.value).every((el) => el === AnswerCorrectness.correct)) {
+            autoCorrectness.value = AnswerCorrectness.correct
+        }
     }
 }
 
-function getOptionStyles(option: Option & { checked: boolean }) {
-    if (option.checked) {
-        return `${$styles.row} ${option.isCorrect ? $styles.correctRow : $styles.wrongRow}`
+function getOptionStyles(index: number) {
+    if (innerOptions.value[index].checked) {
+        return `${$styles.row} ${stylesMap[answersCheckedMap.value[index]]}`
     }
     return $styles.row
 }

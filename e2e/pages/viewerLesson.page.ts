@@ -115,6 +115,42 @@ export class ViewerLessonPage {
         await this.page.waitForLoadState('networkidle')
     }
 
+    async fillTheExercisesWithoutAnswers() {
+        await this.radioExercise
+            .nth(0)
+            .locator('label')
+            .nth(0)
+            .click()
+
+        await this.checkboxExercise
+            .locator('label')
+            .nth(1)
+            .click()
+
+        await this.checkboxExercise
+            .locator('label')
+            .nth(2)
+            .click()
+
+        await this.radioExercise
+            .nth(1)
+            .locator('label')
+            .nth(0)
+            .click()
+
+        await this.inputExercise
+            .locator('input')
+            .fill('qwer')
+
+        await this.inputExercise
+            .locator('input')
+            .press('Enter')
+
+        await this.completeLessonButton.click()
+
+        await this.page.waitForLoadState('networkidle')
+    }
+
     async fillFeedback() {
         const count = await this.editableFeedback.count() // it is definitely the same as two lines upper
 
@@ -130,8 +166,6 @@ export class ViewerLessonPage {
                 // eslint-disable-next-line no-await-in-loop
                 await this.feedbackBlockWrong.nth(i).click()
             }
-            // eslint-disable-next-line no-await-in-loop
-            await this.feedbackBlockSave.nth(i).click()
         }
 
         await this.sendFeedback.click()
