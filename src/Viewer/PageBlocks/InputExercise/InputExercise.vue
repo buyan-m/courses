@@ -21,9 +21,16 @@
                 </template>
             </el-input>
         </el-form-item>
+        <p
+            v-if="visibleAnswer"
+            :class="$style.visibleAnswer"
+        >
+            {{ $t('your-answer') }} "{{ visibleAnswer }}"
+        </p>
         <AnswerFeedback
             v-if="props.answer"
             :answer="props.answer"
+            :auto-correctness="autoCorrectness"
             :is-editable="isTeacher"
             @save-feedback="saveFeedback"
         />
@@ -37,7 +44,7 @@ import { AnswerCorrectness, AnswerTypes, TAnswerFeedback } from '@/types/api-typ
 import AnswerFeedback from '@/Viewer/PageBlocks/AnswerFeedback/AnswerFeedback.vue'
 
 const props = defineProps<{
-    answers: string[],
+    answers?: string[],
     answer?: TextAnswer,
     isTeacher: boolean
 }>()
@@ -51,13 +58,19 @@ const innerAnswer = ref({ text: '' })
 const inputClass = ref('')
 const inputDisabled = ref(false)
 const form = ref(null)
+const visibleAnswer = ref('')
+const autoCorrectness = ref(AnswerCorrectness['not-verified'])
 
 function saveFeedback(feedback: TAnswerFeedback) {
     emit('saveFeedback', feedback)
 }
 
 function checkAnswer(value: string) {
-    if (!props.answers.length || props.answers.some((el) => el === value)) {
+    if (!props.answers || !props.answers.length) {
+        visibleAnswer.value = value
+        return true
+    }
+    if (props.answers.some((el) => el === value)) {
         return true
     }
     return false
@@ -67,6 +80,9 @@ function alreadyAnsweredCallback(alreadyAnsweredValue?: TextAnswer) {
     if (alreadyAnsweredValue) {
         innerAnswer.value.text = alreadyAnsweredValue.value
         inputDisabled.value = true
+        autoCorrectness.value = props.answers?.some(
+            (text: string) => text === alreadyAnsweredValue.value
+        ) ? AnswerCorrectness.correct : AnswerCorrectness.incorrect
     }
 }
 
@@ -77,10 +93,10 @@ function submit() {
             emit('answer', {
                 type: AnswerTypes.input,
                 value: innerAnswer.value.text,
-                correctness: props.answers.length ? AnswerCorrectness.correct : AnswerCorrectness['not-verified'],
+                correctness: props.answers?.length ? AnswerCorrectness.correct : AnswerCorrectness['not-verified'],
                 feedback: ''
             })
-            inputDisabled.value = !!props.answers.length
+            inputDisabled.value = !!props.answers?.length
         }
     })
 }
@@ -98,3 +114,16 @@ watch(() => props.answer, (alreadyAnsweredValue) => {
 })
 alreadyAnsweredCallback(props.answer)
 </script>
+<i18n>
+    {
+        "en": {
+            "your-answer": "Your answer: "
+        }
+    }
+</i18n>
+<style module>
+.visibleAnswer {
+    font-size: var(--el-font-size-small);
+    color: var(--el-color-info)
+}
+</style>

@@ -57,7 +57,7 @@ test.describe('Create course', () => {
         test('Course page shows actual lessons', async ({ page }) => {
             const coursePage = new EditorCoursePage(page)
             await coursePage.goToTheTestCourse()
-            await expect(await coursePage.lessonCard.count()).toEqual(3) // one actual and the other for a new
+            await expect(await coursePage.lessonCard.count()).toEqual(4) // one actual and the other for a new
             await expect(coursePage.lessonCardName(data.testCourse.lessonId)).toHaveValue('lesson 1')
         })
 
@@ -85,7 +85,7 @@ test.describe('Create course', () => {
         test('Lesson card shows pages with actual links', async ({ page }) => {
             const coursePage = new EditorCoursePage(page)
             await coursePage.goToTheTestCourse()
-            await expect(await coursePage.lessonPage().count()).toEqual(4)
+            await expect(await coursePage.lessonPage().count()).toEqual(5)
             await expect(coursePage.lessonPage(data.testCourse.pageId)).toBeVisible()
             await expect(coursePage.lessonPageLink(data.testCourse.pageId))
                 .toHaveAttribute('href', new RegExp(preparedPageLink))

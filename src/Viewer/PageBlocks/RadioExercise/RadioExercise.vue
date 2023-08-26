@@ -22,6 +22,7 @@
         <AnswerFeedback
             v-if="answer"
             :answer="answer"
+            :auto-correctness="autoCorrectness"
             :is-editable="isTeacher"
             @save-feedback="saveFeedback"
         />
@@ -55,6 +56,14 @@ const answerChecked = ref(false)
 const checkedAnswerIndex = ref(-1)
 const originalValue = ref('')
 const isOriginalValueVisible = ref(false)
+const answersCheckedMap = ref<Record<string | number, AnswerCorrectness>>({})
+const autoCorrectness = ref<AnswerCorrectness>(AnswerCorrectness['not-verified'])
+
+const stylesMap: Record<AnswerCorrectness, string> = {
+    [AnswerCorrectness.correct]: $styles.correctRow,
+    [AnswerCorrectness.incorrect]: $styles.wrongRow,
+    [AnswerCorrectness['not-verified']]: ''
+}
 
 function saveFeedback(feedback: TAnswerFeedback) {
     emit('saveFeedback', feedback)
@@ -66,6 +75,17 @@ function alreadyAnsweredCallback(answer?: RadioAnswer) {
         if (checkedAnswerIndex.value === -1) {
             isOriginalValueVisible.value = true
             originalValue.value = answer.value
+        } else {
+            let correctness = AnswerCorrectness['not-verified']
+            if (props.options.some(({ isCorrect }) => isCorrect)) {
+                correctness = AnswerCorrectness.incorrect
+            }
+            if (props.options[checkedAnswerIndex.value].isCorrect) {
+                correctness = AnswerCorrectness.correct
+            }
+            answersCheckedMap.value[checkedAnswerIndex.value] = correctness
+
+            autoCorrectness.value = correctness
         }
         answerChecked.value = true
     }
@@ -87,6 +107,8 @@ function checkAnswer() {
         correctness = AnswerCorrectness.correct
     }
 
+    answersCheckedMap.value[checkedAnswerIndex.value] = correctness
+
     emit('answer', {
         type: AnswerTypes.radio,
         value: props.options[checkedAnswerIndex.value].value,
@@ -97,7 +119,7 @@ function checkAnswer() {
 
 function getOptionStyles(index: number) {
     if (index === checkedAnswerIndex.value) {
-        return `${$styles.row} ${props.options[index].isCorrect ? $styles.correctRow : $styles.wrongRow}`
+        return `${$styles.row} ${stylesMap[answersCheckedMap.value[index]]}`
     }
     return $styles.row
 }

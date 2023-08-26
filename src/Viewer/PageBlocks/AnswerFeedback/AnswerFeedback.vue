@@ -1,6 +1,6 @@
 <template>
     <el-form
-        v-if="isEditable"
+        v-if="isEditable && answer"
         data-test="editableFeedback"
     >
         <el-form-item>
@@ -28,13 +28,6 @@
                     {{ markMap[AnswerCorrectness.incorrect] }}
                 </el-radio-button>
             </el-radio-group>
-            <el-button
-                :class="$style.button"
-                data-test="feedbackBlockSave"
-                @click="saveFeedback"
-            >
-                {{ $t('save') }}
-            </el-button>
         </el-form-item>
     </el-form>
     <p
@@ -56,7 +49,9 @@
 import {
     defineEmits, defineProps, ref, watch, useCssModule
 } from 'vue'
-import { AnswerCorrectness, TAnswer, TAnswerFeedback } from '@/types/api-types'
+import {
+    AnswerCorrectness, TAnswer, TAnswerFeedback
+} from '@/types/api-types'
 
 const markMap = {
     [AnswerCorrectness.correct]: '✅',
@@ -66,14 +61,26 @@ const markMap = {
 
 const props = defineProps<{
     answer: TAnswer,
+    autoCorrectness: AnswerCorrectness,
     isEditable: boolean
 }>()
 
 const $style = useCssModule()
 
+function getInitialCorrectness() {
+    if (props.answer.correctness !== AnswerCorrectness['not-verified']) {
+        return props.answer.correctness
+    }
+    if (props.isEditable) {
+        return props.autoCorrectness
+    }
+
+    return AnswerCorrectness['not-verified']
+}
+
 const emits = defineEmits<{ saveFeedback: [feedback: TAnswerFeedback] }>()
 const innerFeedback = ref(props.answer.feedback || '')
-const innerCorrectness = ref(props.answer.correctness || AnswerCorrectness['not-verified'])
+const innerCorrectness = ref(getInitialCorrectness())
 const mark = ref(markMap[props.answer.correctness])
 
 watch(() => props.answer.feedback, (val) => {
@@ -84,12 +91,24 @@ watch(() => props.answer.correctness, (val) => {
     mark.value = markMap[val]
 })
 
-function saveFeedback() {
+emits('saveFeedback', {
+    correctness: innerCorrectness.value,
+    feedback: innerFeedback.value
+})
+
+watch(() => innerFeedback.value, () => {
     emits('saveFeedback', {
-        feedback: innerFeedback.value,
-        correctness: innerCorrectness.value
+        correctness: innerCorrectness.value,
+        feedback: innerFeedback.value
     })
-}
+})
+
+watch(() => innerCorrectness.value, () => {
+    emits('saveFeedback', {
+        correctness: innerCorrectness.value,
+        feedback: innerFeedback.value
+    })
+})
 
 </script>
 <i18n>
