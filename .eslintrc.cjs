@@ -86,11 +86,11 @@ module.exports = {
                 devDependencies: true,
             }],
         },
-    },{
+    }, {
         files: ['src/types/api-types.ts'],
         rules: {
             'max-classes-per-file': 'off',
-            'max-len': 'off'
-        }
+            'max-len': 'off',
+        },
     }],
 }
