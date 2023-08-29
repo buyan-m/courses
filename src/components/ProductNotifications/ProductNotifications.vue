@@ -5,30 +5,36 @@
     >
         <ul :class="$style.list">
             <li
-                v-for="notification in notifications"
-                :key="notification._id"
+                v-for="_id in notifications"
+                :key="_id"
                 data-test="notification"
                 :class="{
-                    [$style.newNotification]: notification.status === NotificationStates.new,
+                    [$style.newNotification]: notificationsMap[_id].status === NotificationStates.new,
                     [$style.notification]: true
                 }"
             >
                 <router-link
-                    :to="prepareLink(notification)"
-                    @click="readNotification(notification)"
+                    :to="prepareLink(notificationsMap[_id])"
+                    @click="readNotification(notificationsMap[_id])"
                 >
                     <span
                         :class="$style.text"
-                        v-html="prepareDetails(notification)"
+                        v-html="prepareDetails(notificationsMap[_id])"
                     />
                 </router-link>
                 <time
                     :class="$style.time"
-                    :datetime="notification.cdate"
+                    :datetime="notificationsMap[_id].cdate"
                 >
-                    {{ prepareTime(notification.cdate) }}
+                    {{ prepareTime(notificationsMap[_id].cdate) }}
                 </time>
             </li>
+            <li
+                v-show="hasMore"
+                ref="anchor"
+                v-loading="state === PageStatus.loading"
+                :class="$style.anchor"
+            />
         </ul>
         <el-button
             type="primary"
@@ -48,37 +54,97 @@ import {
     TNotification
 } from '@/types/api-types'
 import request from '@/utils/request'
+import { PageStatus } from '@/constants/PageStatus'
+
+const NOTIFICATIONS_LIMIT = 10
 
 function prepareTime(dateString: string) {
     const date = new Date(dateString)
     return date.toLocaleString()
 }
 
+type TNotificationsFilter = {
+    offset: number
+}
+
 export default defineComponent({
     data() {
         return {
-            notifications: [] as TNotification[],
+            notifications: [] as string[],
+            notificationsMap: {} as Record<string, TNotification>,
             unreadCount: 0,
-            NotificationStates
+            NotificationStates,
+            PageStatus,
+            state: PageStatus.loading,
+            observer: null as IntersectionObserver | null,
+            totalCount: 0
+        }
+    },
+    computed: {
+        hasMore() {
+            return this.totalCount > this.notifications.length
         }
     },
 
     mounted() {
-        this.getNotifications()
+        this.getNotifications({ offset: 0 })
+        this.watchForLoadMore()
     },
-
+    beforeUnmount() {
+        if (this.observer) {
+            this.observer.disconnect()
+        }
+    },
     methods: {
-        getNotifications() {
-            request<NotificationsResponse>('/api/notifications')
+        getNotifications({ offset }: TNotificationsFilter) {
+            this.state = PageStatus.loading
+            request<NotificationsResponse>(`/api/notifications?offset=${offset}&limit=${NOTIFICATIONS_LIMIT}`)
                 .then(({ data, errors }) => {
                     if (!errors.length && data?.pageInfo) {
-                        this.notifications = data.notifications
+                        data.notifications.forEach((el) => {
+                            if (!this.notificationsMap[el._id]) {
+                                this.notifications.push(el._id)
+                            }
+                            this.notificationsMap[el._id] = el
+                        })
+
+                        this.notifications.sort((aId, bId) => {
+                            if (this.notificationsMap[aId].cdate > this.notificationsMap[bId].cdate) return -1
+                            if (this.notificationsMap[aId].cdate < this.notificationsMap[bId].cdate) return 1
+                            return 0
+                        })
+
                         this.unreadCount = data.pageInfo.unreadCount
+                        this.totalCount = data.pageInfo.totalCount
+                        if (
+                            NOTIFICATIONS_LIMIT > data.notifications.length
+                            && this.totalCount > this.notifications.length
+                        ) {
+                            this.getNotifications({ offset: 0 })
+                        }
                         this.$emit('notification-count-updated', this.unreadCount)
+                        setTimeout(() => {
+                            this.state = PageStatus.ready
+                        }, 500)
+                    } else {
+                        this.state = PageStatus.error
                     }
                 })
         },
 
+        watchForLoadMore() {
+            this.observer = new IntersectionObserver((entries) => {
+                if (entries[0].isIntersecting
+                && this.state === PageStatus.ready
+                && this.notifications.length < this.totalCount
+                && entries[0].boundingClientRect.height > 10
+                ) {
+                    // debugger
+                    this.getNotifications({ offset: this.notifications.length })
+                }
+            }, { threshold: 0.2 })
+            this.observer.observe(this.$refs.anchor as Element)
+        },
         prepareDetails(notification: TNotification): string {
             if (notification.type === NotificationTypes.courseInvitation) {
                 return this.$t(NotificationTypes.courseInvitation, {
@@ -144,7 +210,7 @@ export default defineComponent({
             request('/api/notifications/read-all', { method: 'put' })
                 .then(({ errors }) => {
                     if (!errors.length) {
-                        this.notifications.forEach((el) => {
+                        Object.values(this.notificationsMap).forEach((el) => {
                             // eslint-disable-next-line no-param-reassign
                             el.status = NotificationStates.viewed
                         })
@@ -188,6 +254,8 @@ export default defineComponent({
     width: 350px;
     list-style: none;
     padding: 0;
+    max-height: 400px;
+    overflow: auto;
 }
 .notification {
     padding: 10px 20px 20px 20px;
@@ -211,5 +279,8 @@ export default defineComponent({
 .container {
     display: flex;
     flex-direction: column;
+}
+.anchor {
+    height: 60px;
 }
 </style>
