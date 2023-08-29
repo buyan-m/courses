@@ -6,26 +6,29 @@
                 v-for="lesson in progress"
                 :key="lesson.lessonId"
             >
+                <span>
+                    {{ lesson.name }}
+                    <template v-if="lesson.passed && lesson.checked">
+                        ✅
+                    </template>
+                    <template v-if="lesson.passed && !lesson.checked">
+                        ❗
+                    </template>
+                </span>
                 <router-link
+                    v-for="page in lesson.pages"
+                    :key="page._id"
                     :to="{
                         name: 'viewer-lesson-teacher-page',
                         params: {
                             lessonId: lesson.lessonId,
                             courseId: $route.params.courseId,
                             studentId: $route.params.studentId,
-                            pageId: lesson.pages[0]._id
+                            pageId: page._id
                         }
                     }"
                 >
-                    <span>
-                        {{ lesson.name }}
-                        <template v-if="lesson.passed && lesson.checked">
-                            ✅
-                        </template>
-                        <template v-if="lesson.passed && !lesson.checked">
-                            ❗
-                        </template>
-                    </span>
+                    {{ page.name }}
                 </router-link>
             </li>
         </ul>
@@ -50,6 +53,7 @@ type AggregatedProgress = {
     checked: boolean
     pages: {
         _id: TPageId
+        name: string
     }[],
 }
 type MinimalAnswer = {
@@ -95,7 +99,7 @@ export default defineComponent({
                         {
                             lessonId: lesson._id,
                             name: lesson.name,
-                            pages: lesson.pages,
+                            pages: lesson.pages.filter(({ _id }) => answerMap[_id]),
                             passed: !!mappedProgress[lesson._id],
                             checked: lesson.pages.every(({ _id }) => !answerMap[_id] || answerMap[_id].checked)
                         }
