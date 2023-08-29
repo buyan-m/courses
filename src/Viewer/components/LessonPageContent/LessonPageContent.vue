@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    ref, h, defineProps, defineEmits, watch, useCssModule
+    ref, h, watch, useCssModule
 } from 'vue'
 import type { VNode } from 'vue'
 import RadioExercise from '@/Viewer/PageBlocks/RadioExercise/RadioExercise.vue'
@@ -11,7 +11,13 @@ import SoundCloud from '@/Viewer/PageBlocks/SoundCloud/SoundCloud.vue'
 import ViewerImageWrapper from '@/Viewer/PageBlocks/ViewerImageWrapper/ViewerImageWrapper.vue'
 import { createYoutubeURL } from '@/utils/embeds'
 import type {
-    TAnswer, AnswerWithId, PageViewerDTO as ViewerPageResponse, EditorBlockType, Option, TAnswerFeedback
+    TAnswer,
+    AnswerWithId,
+    PageViewerDTO as ViewerPageResponse,
+    EditorBlockType,
+    EditorBlockExerciseType,
+    Option,
+    TAnswerFeedback
 } from '@/types/api-types'
 import { AnswerTypes } from '@/types/api-types'
 
@@ -99,7 +105,7 @@ const CONVERTERS = {
             onSaveFeedback: feedbackHandler
         })
     }
-} as Record<EditorBlockType, TConvertor>
+} as Record<EditorBlockType | EditorBlockExerciseType, TConvertor>
 
 function answerHandler(id: string) {
     return (answer: TAnswer) => {
