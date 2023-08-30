@@ -221,15 +221,18 @@ export default defineComponent({
         },
 
         readNotification(notification: TNotification) {
-            return request(`/api/notifications/read/${notification._id}`, { method: 'put' })
-                .then(({ errors }) => {
-                    if (!errors.length) {
+            if (notification.status === NotificationStates.new) {
+                return request(`/api/notifications/read/${notification._id}`, { method: 'put' })
+                    .then(({ errors }) => {
+                        if (!errors.length) {
                         // eslint-disable-next-line no-param-reassign
-                        notification.status = NotificationStates.viewed
-                        this.unreadCount -= 1
-                        this.$emit('notification-count-updated', this.unreadCount)
-                    }
-                })
+                            notification.status = NotificationStates.viewed
+                            this.unreadCount -= 1
+                            this.$emit('notification-count-updated', this.unreadCount)
+                        }
+                    })
+            }
+            return undefined
         },
 
         prepareTime
